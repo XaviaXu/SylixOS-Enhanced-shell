@@ -760,6 +760,94 @@ __print_dirent:
     }
 }
 /*********************************************************************************************************
+** 函数名称: __tshellKeywordMatch
+** 功能描述: shell 根据当前输入命令进行匹配.
+** 输　入  : iFd                           文件描述符
+**           pcKey                         关键字
+**           psicContext                   当前输入上下文
+** 输　出  : NONE
+** 全局变量:
+** 调用模块:
+*********************************************************************************************************/
+static VOID  __tshellKeywordMatch (INT  iFd, PCHAR  pcKey,
+                                __PSHELL_INPUT_CTX  psicContext)
+{
+#define __KEYWORD_BUFF_SIZE          300
+    UINT                kwMatch = 0;
+    REGISTER INT        i, fst;
+    REGISTER ULONG      ulGetNum;
+    size_t              stSimilar;
+    size_t              stMinSimilar;
+    size_t              stKwLen;
+    size_t              stCatLen;
+    __PTSHELL_KEYWORD   pskwNodeStart = LW_NULL;
+    __PTSHELL_KEYWORD   keywordList[__KEYWORD_BUFF_SIZE];
+    CHAR                cPrint[MAX_FILENAME_LENGTH];
+
+    ulGetNum = __tshellKeywordList(pskwNodeStart, keywordList, __KEYWORD_BUFF_SIZE);
+
+    stKwLen = lib_strlen(pcKey);
+    stMinSimilar = 0;
+    fst = -1;
+
+    for (i = 0; i < ulGetNum; i++) {
+        if (lib_strncmp(pcKey, keywordList[i]->SK_pcKeyword, stKwLen) == 0) {
+            ++kwMatch;
+            if(fst == -1){
+                fst = i;
+                stMinSimilar = lib_strlen(keywordList[fst]->SK_pcKeyword);
+            }else{
+                stSimilar = __similarLen(keywordList[fst]->SK_pcKeyword, keywordList[i]->SK_pcKeyword);
+                if(stSimilar < stMinSimilar) {
+                    stMinSimilar = stSimilar;
+                }
+            }
+        }
+    }
+
+    if(fst == -1) {
+        snprintf(cPrint, MAX_FILENAME_LENGTH, "%s", pcKey);
+    } else {
+        snprintf(cPrint, MAX_FILENAME_LENGTH, "%s", keywordList[fst]->SK_pcKeyword);
+    }
+
+    if(kwMatch == 1) { /* 补全这一关键字 */
+
+        stCatLen = lib_strlen(cPrint) - stKwLen;
+        if (stCatLen == 0)
+            return;
+        write(iFd, &cPrint[stKwLen], stCatLen);
+
+        lib_strlcat(CTX_BUFFER, &cPrint[stKwLen], LW_CFG_SHELL_MAX_COMMANDLEN);
+        CTX_TOTAL  += (UINT)stCatLen;
+        CTX_CURSOR  = CTX_TOTAL;
+
+    } else if (kwMatch > 1) { /* 打印所有关键字 */
+        fdprintf(iFd, "\n");
+
+        for (i = 0; i < ulGetNum; i++) {
+            stSimilar = __similarLen(pcKey, keywordList[i]->SK_pcKeyword);
+            if(stSimilar >= stMinSimilar) {
+                fdprintf(iFd, "%s  ", keywordList[i]->SK_pcKeyword);
+            }
+        }
+
+        fdprintf(iFd, "\n");
+        __tshellShowPrompt();
+
+        if (stMinSimilar > stKwLen) {
+            cPrint[stMinSimilar] = PX_EOS;                 /*  自动匹配输入至相似处        */
+            lib_strlcat(CTX_BUFFER,
+                        &cPrint[stKwLen],
+                        LW_CFG_SHELL_MAX_COMMANDLEN);
+            CTX_TOTAL  = lib_strlen(CTX_BUFFER);
+            CTX_CURSOR = CTX_TOTAL;
+        }
+        write(iFd, CTX_BUFFER, CTX_TOTAL);
+    }
+
+}
+/*********************************************************************************************************
 ** 函数名称: __tshellCharTab
 ** 功能描述: shell 收到一个 tab 按键.
 ** 输　入  : iFd                           文件描述符
@@ -781,6 +869,7 @@ static VOID  __tshellCharTab (INT  iFd, __PSHELL_INPUT_CTX  psicContext)
              CHAR        cCommandBuffer[LW_CFG_SHELL_MAX_COMMANDLEN + 1];
              PCHAR       pcParamList[LW_CFG_SHELL_MAX_PARAMNUM + 1];    /*  参数列表                    */
              
+             PCHAR       pcKey;
              PCHAR       pcDir;
              PCHAR       pcFileName;
     REGISTER ULONG       ulError;
@@ -832,6 +921,19 @@ static VOID  __tshellCharTab (INT  iFd, __PSHELL_INPUT_CTX  psicContext)
         }
     }
     
+    /* {自动补全 */
+
+    if(i == 0) {
+        pcKey = pcParamList[0];
+        if (lib_strlen(pcCmd) == 0) {
+            return;
+        }
+        __tshellKeywordMatch(iFd, pcKey, psicContext);
+        return;
+    }
+
+    /* 自动补全} */
+
     pcDir = pcParamList[i];                                             /*  仅分析最后一个字段          */
     if (pcDir == LW_NULL) {
         return;
