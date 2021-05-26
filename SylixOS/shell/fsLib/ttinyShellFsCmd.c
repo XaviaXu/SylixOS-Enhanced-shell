@@ -82,6 +82,9 @@
 #if LW_CFG_POSIX_EN > 0
 #include "fnmatch.h"
 #endif                                                                  /*  LW_CFG_POSIX_EN > 0         */
+
+#include "../SylixOS/shell/commands/find.h"
+
 /*********************************************************************************************************
   函数声明
 *********************************************************************************************************/
@@ -2304,6 +2307,19 @@ static INT  __tshellFsCmdMkGrub (INT  iArgC, PCHAR  ppcArgV[])
 #endif                                                                  /*  LW_CFG_CPU_ARCH_X86         */
 #endif                                                                  /*  LW_CFG_OEMDISK_EN > 0       */
 /*********************************************************************************************************
+** 函数名称: __tshellFsCmdFind
+** 功能描述: 系统命令 "clrgpt"
+** 输　入  : iArgC         参数个数
+**           ppcArgV       参数表
+** 输　出  : 0
+** 全局变量:
+** 调用模块:
+*********************************************************************************************************/
+static INT  __tshellFsCmdFind (INT  iArgC, PCHAR  ppcArgV[])
+{
+    return exec_find(iArgC, ppcArgV);
+}
+/*********************************************************************************************************
 ** 函数名称: __tshellFsCmdInit
 ** 功能描述: 初始化文件系统命令集
 ** 输　入  : NONE
@@ -2456,6 +2472,9 @@ VOID  __tshellFsCmdInit (VOID)
     API_TShellFormatAdd("mkgrub", " [block I/O device]");
     API_TShellHelpAdd("mkgrub",   "make disk grub boot program\n");
 #endif                                                                  /*  LW_CFG_CPU_ARCH_X86         */
+
+    API_TShellKeywordAdd("find", __tshellFsCmdFind);
+
 #endif                                                                  /*  LW_CFG_OEMDISK_EN > 0       */
 }
 

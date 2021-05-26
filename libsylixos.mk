@@ -1779,7 +1779,10 @@ SylixOS/shell/ttinyUser/ttinyUserAdmin.c \
 SylixOS/shell/ttinyUser/ttinyUserAuthen.c \
 SylixOS/shell/ttinyUser/ttinyUserCache.c \
 SylixOS/shell/ttinyVar/ttinyVar.c \
-SylixOS/shell/ttinyVar/ttinyVarLib.c
+SylixOS/shell/ttinyVar/ttinyVarLib.c \
+SylixOS/shell/interpreter/shellcall.c \
+SylixOS/shell/interpreter/tryc.c \
+SylixOS/shell/commands/find.c
 
 #*********************************************************************************************************
 # Symbol source

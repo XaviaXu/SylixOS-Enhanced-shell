@@ -96,6 +96,10 @@
 #include "time.h"
 #endif
 /*********************************************************************************************************
+  新增命令
+*********************************************************************************************************/
+#include "../SylixOS/shell/interpreter/tryc.h"
+/*********************************************************************************************************
 ** 函数名称: __tshellSysCmdArgs
 ** 功能描述: 系统命令 "args"
 ** 输　入  : iArgC         参数个数
@@ -2697,6 +2701,26 @@ static INT  __tshellSysCmdCrashTrap (INT  iArgC, PCHAR  ppcArgV[])
 
 #endif                                                                  /*  LW_CFG_GDB_EN > 0           */
 /*********************************************************************************************************
+** 函数名称: __tshellSysCmdTryc
+** 功能描述: 系统命令 "tryc"
+** 输　入  : iArgC         参数个数
+**           ppcArgV       参数表
+** 输　出  : 0
+** 全局变量:
+** 调用模块:
+*********************************************************************************************************/
+static INT  __tshellSysCmdTryc (INT  iArgC, PCHAR  ppcArgV[])
+{
+    INT i;
+
+    i = tryc_exec(iArgC, ppcArgV);
+    if (i) {
+        return (PX_ERROR);
+    }
+
+    return  (ERROR_NONE);
+}
+/*********************************************************************************************************
 ** 函数名称: __tshellSysCmdInit
 ** 功能描述: 初始化系统命令集
 ** 输　入  : NONE
@@ -3038,6 +3062,8 @@ VOID  __tshellSysCmdInit (VOID)
     API_TShellHelpAdd("crashtrap",   "set or get process crash trap setting.\n"
                                      "if enable, the process crash will not be killed but waiting for debugger.\n");
 #endif                                                                  /*  LW_CFG_GDB_EN > 0           */
+    API_TShellKeywordAdd("tryc", __tshellSysCmdTryc);
+    API_TShellFormatAdd("tryc", " [-d] filename");
 }
 
 #endif                                                                  /*  LW_CFG_SHELL_EN > 0         */
