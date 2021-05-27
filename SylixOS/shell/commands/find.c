@@ -1,250 +1,249 @@
-/*
- * find.c
- *
- *  Created on: May 24, 2021
- *      Author: 25412
- */
-
-
 #include <stdio.h>
-#include <stdlib.h>  // required for pre-c89 compilers see https://stackoverflow.com/questions/15418262/troubling-converting-string-to-long-long-in-c
-#include <getopt.h>  // getopt
-#include <dirent.h>  // directory functions
-#include <string.h>  // strcat, strcmp
-#include <libgen.h>  // header files for dirname()
-#include <sys/stat.h> // file stats
-#include <time.h>  // time
+#include <getopt.h>
+#include <string.h>
+#include <stdlib.h>
+#include <dirent.h>
+#include <sys/stat.h>
 
-#include "find.h"
+#define MEET 1
+#define MISS 0
 
-/*
-* Perform an action designated in 'action' on the file
-* given in 'fullpath'.
-* If no action is given, a default action of printing out 'fullpath'
-* is taken.
-*/
-static void do_action(char * fullpath, char * action, char ** remaining) {
-    // available actions
-    char * delete = "delete";
-    char * cat = "cat";
-    char * rm = "rm";
-    char * mv = "mv";
+#define GREATER 1
+#define LESS -1
+#define EQUAL 0
 
-    if (action == NULL) {
-        // no action, print full path
-        printf("%s\n", fullpath);
-    } else if (strcmp(action, delete) == 0 || strcmp(action, rm) == 0) {
-        // delete file at full path recursivley in case it is a directory.
-        char * argv[4] = {rm, "-r", fullpath, NULL};
-        execvp(rm, argv);
-    } else if (strcmp(action, cat) == 0) {
-        // perform cat on full path
-        char * argv[3] = {cat, fullpath, NULL};
-        execvp(cat, argv);
-    } else if (strcmp(action, mv) == 0) {
-        // perform mv on found file
-        // TODO: would like to find a way to pass all remaining arguments
-        // instead of just the first one, so that user could use options when
-        // using -exec.
-        char * argv[4] = {mv, fullpath, remaining[0], NULL};
-        execvp(mv, argv);
-    } else {
-        printf("Invalid -exec command \"%s\" for file %s.\n", action, fullpath);
+char *nameRes = NULL;
+int inumRes = -1;
+char *rootDir = NULL;
+char *typeRes = NULL;
+int maxDepth = -1;
+long sizeRes = -1;
+int sizeFlag = 0;
+
+char currDir[] = ".";
+char preDir[] = "..";
+int mask = 0xfff;
+
+static struct option options[] = {
+    {"name",required_argument,NULL,'n'},
+    {"perm",required_argument,NULL,'p'},
+    {"depth",required_argument,NULL,'d'},
+    {"type",required_argument,NULL,'t'},
+    {"size",required_argument,NULL,'s'},
+    {NULL,0,NULL,0}
+
+};
+
+int transPermission(char * in){
+    int perm = 0;
+    int i;
+    for (i = 0; i < 3; i++)
+    {
+        int tmp = in[i]-'0';
+        perm += (tmp<<(3*(2-i)));
     }
+    return perm;
 }
 
-/*
-* Check if the file at 'fulllpath' meets any given criteria.
-* return 1 (true) if it does, 0 (false) otherwise.
-*/
-static int meets_criteria(char * fullpath, char * entry_name, char * name, char * mmin, char * inum) {
+long transFileSize(char *in){
+    
+    long totalSize = 0;
+    char sizeType = in[strlen(in)-1];
 
-    int criteria_met = 0;
-    struct stat filestats;
-
-    if (name != NULL) {
-        // if the entry name matches the critera name
-        if(strcmp(entry_name, name) == 0) {
-            criteria_met = 1;
-        }
-    } else if (mmin != NULL) {
-        stat(fullpath, &filestats);
-        char modifier;
-        int minutes;
-        int lastmodified;
-        // check for '+' or '-' and convert
-        // time given in minutes to minutes
-        if (!isdigit(mmin[0])) {
-            modifier = mmin[0];
-            minutes = atoi(++mmin);
-        } else {
-            minutes = atoi(mmin);
-        }
-        lastmodified = (int)(time(0) - filestats.st_mtime) / 60;
-        // greater than
-        if (modifier == '+' && lastmodified > minutes) {
-            criteria_met = 1;
-        // less than
-        } else if ( modifier == '-' && lastmodified < minutes) {
-            criteria_met = 1;
-        // equal (exactly)
-        } else if (lastmodified == minutes) {
-            criteria_met = 1;
-        }
-    } else if (inum != NULL) {
-        stat(fullpath, &filestats);
-        // file's inode number equals input inode number
-        // cast/convert to long long to support 32bit architectures
-        if ((long long)filestats.st_ino == atoll(inum)) {
-            criteria_met = 1;
-        }
-    } else {
-        criteria_met = 1;
+    in[strlen(in)-1] = '\0';    
+    if(in[0]=='+'){
+        sizeFlag = GREATER;
+        totalSize = atol(++in);
+    }else if(in[0]=='-'){
+        sizeFlag = LESS;
+        totalSize = atol(++in);
+    }else{
+        sizeFlag = EQUAL;
+        totalSize = atol(in);
     }
 
-    return criteria_met;
+    switch (sizeType)
+    {
+    case 'b':
+        totalSize*=512;
+        break;
+    case 'w':
+        totalSize *= 2;
+        break;
+    case 'k':
+        totalSize *= 1000;
+        break;
+    case 'M':
+        totalSize *= 1000000;
+        break;
+    case 'G':
+        totalSize *= 1000000000;
+        break;
+    default:
+        break;
+    }
+
+    return totalSize;
+
 }
 
+int checkType(char fileType){
+    if(strcmp(typeRes,"f")==0&&fileType==DT_REG){
+        //f: regular file
+        return 1;
+    }else if(strcmp(typeRes,"l")==0&&fileType==DT_LNK){
+        //l: symbolic link
+        return 1;
+    }else if(strcmp(typeRes,"d")==0&&fileType==DT_DIR){
+        //d: directory
+        return 1;
+    }else if(strcmp(typeRes,"c")==0&&fileType==DT_CHR){
+        //c: character device
+        return 1;
+    }else if(strcmp(typeRes,"b")==0&&fileType==DT_BLK){
+        return 1;
+    }else if(strcmp(typeRes,"s")==0&&fileType==DT_SOCK){
+        return 1;
+    }else if(strcmp(typeRes,"p")==0&&fileType==DT_FIFO){
+        return 1;
+    }
+    return 0;
+}
 
-/*
-* find files and/or directories that meet critera if any, and perform an action on
-* those files if any is given.
-* Criteria available:
-    * none (default)
-    * match name (-name <filename>)
-    * last modified time (-min <[+|-|]minutes>)
-    * match inode number (-inum <inode number>)
+int checkSize(long fileSize){
+    if(sizeFlag == EQUAL &&fileSize==sizeRes){
+        return 1;
+    }else if(sizeFlag==GREATER && fileSize > sizeRes){
+        return 1;
+    }else if(sizeFlag==LESS && fileSize < sizeRes){
+        return 1;
+    }
+    return 0;
+}
 
-* Actions available:
-    * print full path of file/directory (default)
-    * delete file (-exec delete)
-    * remove file (-exec rm)
-    * cat file (-exec cat)
-    * mv file (-exec mv <specified path>)
-*/
-static void find(char * where, char * name, char * mmin, char * inum, char * action, char ** remaining)  {
-    DIR * dir;// directory stream
-    struct dirent * entry;
-    char * e_name;
-    char fullpath[1024];
-    char curr_dir[] = ".";
-    char pre_dir[] = "..";
-    int e_type;
-    int is_dots;
-    int criteria = name != NULL || mmin != NULL || inum != NULL;
+int checkStandard(char *filePath,char *fileName,char fileType){
+    int flag = MEET;
+    struct stat fileStat;
+    stat(filePath,&fileStat);
 
-    if (dir = opendir(where)) {
+    if(nameRes!=NULL){
+        //add: regex & * ?
+        if(strcmp(fileName,nameRes)!=0){
+            flag = MISS;
+        }
+    }
+    if(inumRes!=-1){
+        int status = fileStat.st_mode & mask;
+        if(inumRes!=status){
+            flag = MISS;
+        }
+    }
+    if(typeRes!=NULL){
+        if(checkType(fileType)==0){
+            flag = MISS;
+        }
+    }
+    flag &= (sizeRes==-1||(checkSize(fileStat.st_size)&&fileType!=DT_DIR));
+    return flag;
 
-        while ((entry = readdir(dir)) != NULL) {
-            e_type = entry -> d_type;
-            e_name = entry -> d_name;
-            is_dots = strcmp(e_name, curr_dir) == 0 || strcmp(e_name, pre_dir) == 0;
+}
 
-            // concat for full path
-            snprintf(fullpath, sizeof(fullpath),
-            "%s/%s", where, e_name);
+void find(char* path,int depth){
+    DIR *dir;
+    struct dirent *file;
+    char *fileName;
+    char fileType;
+    char fullPath[1024];
 
-            // if the entry is a sub directory and is not "." or ".."
-            if (!is_dots) {
-
-                // perform action on entry
-                if (meets_criteria(fullpath, e_name, name, mmin, inum)) {
-                    // perform some action on file
-                    do_action(fullpath, action, remaining);
-                }
-
-                // if entry is directory, recursivly call find for entry
-                if (e_type == DT_DIR) {
-                    // recursive for directory
-                    find(fullpath, name, mmin, inum, action, remaining);
-                }
-
+    if(dir = opendir(path)){
+        while ((file = readdir(dir))!=NULL)
+        {
+            fileName = file->d_name;
+            fileType = file->d_type;
+            if(strcmp(path,"/")==0){
+                snprintf(fullPath,sizeof(fullPath),"%s%s",path,fileName);
+            }else{
+                snprintf(fullPath,sizeof(fullPath),"%s/%s",path,fileName);
             }
+            
+            
 
+            if(!(strcmp(currDir,fileName)==0||strcmp(preDir,fileName)==0)){
+                //selection
+                if(checkStandard(fullPath,fileName,fileType)){
+                    printf("%s\n",fullPath);
+                }
+
+                if(fileType == DT_DIR&&(maxDepth==-1||depth>0)){
+                    find(fullPath,depth-1);
+                }
+            }
         }
-        // close directory stream
         closedir(dir);
-    } else {
-        // error opening diretory stream
-        printf("Could not open directory %s\n", where);
+        
+
+    }else{
+        printf("Could not open directory %s\n", rootDir);
     }
+
+
 }
 
-
-int exec_find (int argc, char ** argv)
-{
-    // valid options given for find
-    // set to 1 (true) initially because the user can
-    // run ./find without any args.
-    int valid = 1;
-
-    // criteria variables
-    char *where = NULL;
-    char *name = NULL;
-    char *mmin = NULL;
-    char *inum = NULL;
-    // action variables
-    char *action = NULL;
-    // sepcified option variable
+int exec_find (int argc, char ** argv){
+    
     char c;
+    int valid = 1; 
 
-    // set where-to-look
-    if (argc > 1 && argv[1][0] != '-') {
-        // user given directory
-        where = argv[1];
-        argc--;
+    if(argc > 1 && argv[1][0] !='-'){
+        //dir given
+        rootDir = argv[1];
         argv++;
-    } else {
-        // current directory
-        where = ".";
+        argc--;
+    }else{
+        rootDir = ".";
     }
 
-    // comand line option arguments
-    static struct option long_options[] = {
-        {"name", required_argument, NULL, 'n'},
-        {"min", required_argument, NULL, 'm'},
-        {"inum", required_argument, NULL, 'i'},
-        {"exec", required_argument, NULL, 'e'},
-        {NULL, 0, NULL, 0}
-    };
+    while ((c = getopt_long_only(argc, argv, "n:p:d:", options, NULL)) != -1) {
 
-    // get command line options
-    while ((c = getopt_long_only(argc, argv, "w:n:m:i:e:", long_options, NULL)) != -1) {
-
-        switch (c) {
-            case 'n':
-                name = optarg;
-                break;
-            case 'm':
-                mmin = optarg;
-                break;
-            case 'i':
-                inum = optarg;
-                break;
-            case 'e':
-                action = optarg;
-                break;
-            default:
-                // invalid
-                valid = 0;
-                break;
+        /* code */
+        switch (c)
+        {
+        case 'n':
+            //search by name
+            nameRes = optarg;
+            printf("%s\n",nameRes);
+            break;
+        case 'p':
+            //search by rights
+            inumRes = transPermission(optarg);
+            break;
+        case 'd':
+            maxDepth = atoi(optarg)-1;
+            break;
+        case 't':
+            typeRes = optarg;
+            break;
+        case 's':
+            sizeRes = transFileSize(optarg);
+            break;
+        default:
+            valid = 0;
+            break;
         }
+
     }
 
-    // adjust after processing of arguments
-    argc -= optind;
     argv += optind;
+    argc -= optind;
 
-    // print out initial directory if no criteria or action was given
-    if (name == NULL && mmin == NULL && inum == NULL && action == NULL) {
-        printf("%s\n", where);
+    //output initial location?
+    if(nameRes==NULL&&typeRes==NULL){
+
     }
-
-    // if valid options were given, call find funciton
-    if (valid) {
-        find(where, name, mmin, inum, action, argv);
+    //find
+    if(valid){
+        find(rootDir,maxDepth);
     }
-
     return 0;
 
 }
