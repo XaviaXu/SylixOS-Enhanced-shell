@@ -38,6 +38,7 @@
 #include "ttinyShellLib.h"
 #include "ttinyShellSysCmd.h"
 #include "ttinyString.h"
+#include "ttinyShellColor.h"
 /*********************************************************************************************************
   函数声明
 *********************************************************************************************************/
@@ -825,12 +826,16 @@ static VOID  __tshellKeywordMatch (INT  iFd, PCHAR  pcKey,
     } else if (kwMatch > 1) { /* 打印所有关键字 */
         fdprintf(iFd, "\n");
 
+        tshellColorStart2(LW_TSHELL_COLOR_LIGHT_GREEN, iFd);
+
         for (i = 0; i < ulGetNum; i++) {
             stSimilar = __similarLen(keywordList[fst]->SK_pcKeyword, keywordList[i]->SK_pcKeyword);
             if(stSimilar >= stMinSimilar) {
                 fdprintf(iFd, "%s  ", keywordList[i]->SK_pcKeyword);
             }
         }
+
+        tshellColorEnd(iFd);
 
         fdprintf(iFd, "\n");
         __tshellShowPrompt();
