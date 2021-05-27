@@ -826,7 +826,7 @@ static VOID  __tshellKeywordMatch (INT  iFd, PCHAR  pcKey,
         fdprintf(iFd, "\n");
 
         for (i = 0; i < ulGetNum; i++) {
-            stSimilar = __similarLen(pcKey, keywordList[i]->SK_pcKeyword);
+            stSimilar = __similarLen(keywordList[fst]->SK_pcKeyword, keywordList[i]->SK_pcKeyword);
             if(stSimilar >= stMinSimilar) {
                 fdprintf(iFd, "%s  ", keywordList[i]->SK_pcKeyword);
             }
