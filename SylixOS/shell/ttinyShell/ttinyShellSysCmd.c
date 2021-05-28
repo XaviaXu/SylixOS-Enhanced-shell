@@ -99,6 +99,7 @@
   新增命令
 *********************************************************************************************************/
 #include "../SylixOS/shell/interpreter/tryc.h"
+#include "../SylixOS/shell/commands/grep.h"
 /*********************************************************************************************************
 ** 函数名称: __tshellSysCmdArgs
 ** 功能描述: 系统命令 "args"
@@ -2721,6 +2722,26 @@ static INT  __tshellSysCmdTryc (INT  iArgC, PCHAR  ppcArgV[])
     return  (ERROR_NONE);
 }
 /*********************************************************************************************************
+** 函数名称: __tshellSysCmdGrep
+** 功能描述: 系统命令 "tryc"
+** 输　入  : iArgC         参数个数
+**           ppcArgV       参数表
+** 输　出  : 0
+** 全局变量:
+** 调用模块:
+*********************************************************************************************************/
+static INT  __tshellSysCmdGrep (INT  iArgC, PCHAR  ppcArgV[])
+{
+    INT i;
+
+    i = grep_exec(iArgC, ppcArgV);
+    if (i) {
+        return (PX_ERROR);
+    }
+
+    return  (ERROR_NONE);
+}
+/*********************************************************************************************************
 ** 函数名称: __tshellSysCmdInit
 ** 功能描述: 初始化系统命令集
 ** 输　入  : NONE
@@ -3064,6 +3085,8 @@ VOID  __tshellSysCmdInit (VOID)
 #endif                                                                  /*  LW_CFG_GDB_EN > 0           */
     API_TShellKeywordAdd("tryc", __tshellSysCmdTryc);
     API_TShellFormatAdd("tryc", " [-d] filename");
+    API_TShellKeywordAdd("grep", __tshellSysCmdGrep);
+    API_TShellFormatAdd("grep", " [pattern] [files...]");
 }
 
 #endif                                                                  /*  LW_CFG_SHELL_EN > 0         */

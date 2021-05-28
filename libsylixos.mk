@@ -1782,7 +1782,8 @@ SylixOS/shell/ttinyVar/ttinyVar.c \
 SylixOS/shell/ttinyVar/ttinyVarLib.c \
 SylixOS/shell/interpreter/shellcall.c \
 SylixOS/shell/interpreter/tryc.c \
-SylixOS/shell/commands/find.c
+SylixOS/shell/commands/find.c \
+SylixOS/shell/commands/grep.c \
 
 #*********************************************************************************************************
 # Symbol source
