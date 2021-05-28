@@ -111,6 +111,7 @@ int checkType(char fileType){
 }
 
 int checkSize(long fileSize){
+    if(sizeRes == -1){return 1;}
     if(sizeFlag == EQUAL &&fileSize==sizeRes){
         return 1;
     }else if(sizeFlag==GREATER && fileSize > sizeRes){
@@ -143,7 +144,8 @@ int checkStandard(char *filePath,char *fileName,char fileType){
             flag = MISS;
         }
     }
-    flag &= (sizeRes==-1||(checkSize(fileStat.st_size)&&fileType!=DT_DIR));
+    flag &= checkSize(fileStat.st_size);
+
     return flag;
 
 }
