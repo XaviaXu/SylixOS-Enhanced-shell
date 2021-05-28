@@ -5,20 +5,24 @@
 #include <dirent.h>
 #include <sys/stat.h>
 
-#define MEET 1
-#define MISS 0
+#define TRUE  1
+#define FALSE 0
 
 #define GREATER 1
 #define LESS -1
 #define EQUAL 0
 
 char *nameRes = NULL;
+int nameFlag = FALSE;
 int inumRes = -1;
 char *rootDir = NULL;
 char *typeRes = NULL;
 int maxDepth = -1;
 long sizeRes = -1;
 int sizeFlag = 0;
+char *aTimeRes = NULL;
+char *mTimeRes = NULL;
+
 
 char currDir[] = ".";
 char preDir[] = "..";
@@ -26,12 +30,14 @@ int mask = 0xfff;
 
 static struct option options[] = {
     {"name",required_argument,NULL,'n'},
+    {"iname",required_argument,NULL,'N'},
     {"perm",required_argument,NULL,'p'},
     {"depth",required_argument,NULL,'d'},
     {"type",required_argument,NULL,'t'},
     {"size",required_argument,NULL,'s'},
+    {"amin",required_argument,NULL,'a'},
+    {"mmin",required_argument,NULL,'m'},
     {NULL,0,NULL,0}
-
 };
 
 int transPermission(char * in){
@@ -87,65 +93,100 @@ long transFileSize(char *in){
 
 }
 
+int checkName(char *fileName){
+    if(nameRes==NULL){return TRUE;}
+    if(nameFlag){
+        int res = strcasecmp(fileName,nameRes);
+        return res==0?TRUE:FALSE;
+    }else{
+        return strcmp(fileName,nameRes)==0?TRUE:FALSE;
+    }
+}
+
 int checkType(char fileType){
+    if(typeRes==NULL){return TRUE;}
     if(strcmp(typeRes,"f")==0&&fileType==DT_REG){
         //f: regular file
-        return 1;
+        return TRUE;
     }else if(strcmp(typeRes,"l")==0&&fileType==DT_LNK){
         //l: symbolic link
-        return 1;
+        return TRUE;
     }else if(strcmp(typeRes,"d")==0&&fileType==DT_DIR){
         //d: directory
-        return 1;
+        return TRUE;
     }else if(strcmp(typeRes,"c")==0&&fileType==DT_CHR){
         //c: character device
-        return 1;
+        return TRUE;
     }else if(strcmp(typeRes,"b")==0&&fileType==DT_BLK){
-        return 1;
+        return TRUE;
     }else if(strcmp(typeRes,"s")==0&&fileType==DT_SOCK){
-        return 1;
+        return TRUE;
     }else if(strcmp(typeRes,"p")==0&&fileType==DT_FIFO){
-        return 1;
+        return TRUE;
     }
-    return 0;
+    return FALSE;
 }
 
 int checkSize(long fileSize){
-    if(sizeRes == -1){return 1;}
+    if(sizeRes==-1){return TRUE;}
     if(sizeFlag == EQUAL &&fileSize==sizeRes){
-        return 1;
+        return TRUE;
     }else if(sizeFlag==GREATER && fileSize > sizeRes){
-        return 1;
+        return TRUE;
     }else if(sizeFlag==LESS && fileSize < sizeRes){
-        return 1;
+        return TRUE;
     }
-    return 0;
+    return FALSE;
+}
+
+int checkTime(time_t fileTime, char *deltaTime){
+    if(deltaTime==NULL){return TRUE;}
+    char modifier;
+    int mins;
+    int delt;
+    if(!isdigit(deltaTime[0])){
+        modifier = deltaTime[0];
+        mins = atoi(++deltaTime);
+    }else{
+        mins = atoi(deltaTime);
+    }
+
+    delt = (int)(time(0)-fileTime)/60;
+    if(modifier=='+' && delt > mins){
+        return TRUE;
+    }else if(modifier=='-' && delt < mins){
+        return TRUE;
+    }else if(delt==mins){
+        return TRUE;
+    }
+
+    return FALSE;
+
 }
 
 int checkStandard(char *filePath,char *fileName,char fileType){
-    int flag = MEET;
+    int flag = TRUE;
     struct stat fileStat;
     stat(filePath,&fileStat);
 
-    if(nameRes!=NULL){
-        //add: regex & * ?
-        if(strcmp(fileName,nameRes)!=0){
-            flag = MISS;
-        }
-    }
+    
+    flag &= checkName(fileName);
+
     if(inumRes!=-1){
         int status = fileStat.st_mode & mask;
         if(inumRes!=status){
-            flag = MISS;
+            flag = FALSE;
         }
     }
-    if(typeRes!=NULL){
-        if(checkType(fileType)==0){
-            flag = MISS;
-        }
-    }
-    flag &= checkSize(fileStat.st_size);
+    //check file type
+    flag &= checkType(fileType);
 
+    //check last access/modification time
+    flag &= checkTime(fileStat.st_atime,aTimeRes);
+    flag &= checkTime(fileStat.st_mtime, mTimeRes);
+
+    //check file size
+    flag &= checkSize(fileStat.st_size);
     return flag;
 
 }
@@ -167,8 +208,7 @@ void find(char* path,int depth){
             }else{
                 snprintf(fullPath,sizeof(fullPath),"%s/%s",path,fileName);
             }
-            
-            
+                        
 
             if(!(strcmp(currDir,fileName)==0||strcmp(preDir,fileName)==0)){
                 //selection
@@ -182,13 +222,9 @@ void find(char* path,int depth){
             }
         }
         closedir(dir);
-        
-
     }else{
         printf("Could not open directory %s\n", rootDir);
     }
-
-
 }
 
 int exec_find (int argc, char ** argv){
@@ -205,15 +241,16 @@ int exec_find (int argc, char ** argv){
         rootDir = ".";
     }
 
-    while ((c = getopt_long_only(argc, argv, "n:p:d:", options, NULL)) != -1) {
+    while ((c = getopt_long_only(argc, argv, "n:N:p:d:t:s:a:m:", options, NULL)) != -1) {
 
         /* code */
         switch (c)
         {
+        case 'N':
+            nameFlag = TRUE;
         case 'n':
             //search by name
             nameRes = optarg;
-            printf("%s\n",nameRes);
             break;
         case 'p':
             //search by rights
@@ -228,6 +265,13 @@ int exec_find (int argc, char ** argv){
         case 's':
             sizeRes = transFileSize(optarg);
             break;
+        case 'a':
+            aTimeRes = optarg;
+            break;
+        case 'm':
+            mTimeRes = optarg;
+            break;
+
         default:
             valid = 0;
             break;
