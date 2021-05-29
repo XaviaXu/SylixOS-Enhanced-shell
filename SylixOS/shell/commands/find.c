@@ -27,6 +27,8 @@ char *aTimeRes = NULL;
 char *mTimeRes = NULL;
 char *actionRes = NULL;
 
+int resFlag = 0;
+
 
 char currDir[] = ".";
 char preDir[] = "..";
@@ -293,28 +295,35 @@ int exec_find (int argc, char ** argv){
         case 'n':
             //search by name
             nameRes = optarg;
+            resFlag++;
             break;
         case 'p':
             //search by rights
             inumRes = transPermission(optarg);
+            resFlag++;
             break;
         case 'd':
             maxDepth = atoi(optarg)-1;
             break;
         case 't':
             typeRes = optarg;
+            resFlag++;
             break;
         case 's':
             sizeRes = transFileSize(optarg);
+            resFlag++;
             break;
         case 'a':
             aTimeRes = optarg;
+            resFlag++;
             break;
         case 'm':
             mTimeRes = optarg;
+            resFlag++;
             break;
         case 'e':
             actionRes = optarg;
+            resFlag++;
             break;
         default:
             valid = 0;
@@ -327,8 +336,8 @@ int exec_find (int argc, char ** argv){
     argc -= optind;
 
     //output initial location?
-    if(nameRes==NULL&&typeRes==NULL){
-
+    if(resFlag==0){
+        printf("%s\n",rootDir);
     }
     //find
     if(valid){
