@@ -26,6 +26,7 @@
 
 #define MAX_CMD_LENTH 1024
 #define CMD_OUT_BUF_LENGTH 1024
+#define READ_STR_BUF_LENGTH 1024
 
 #ifndef bool
 #define bool int
@@ -64,7 +65,7 @@ static double return_val = 0;           /* used for reserve the return value of 
 /* tokens and classes (operators last and in precedence order) */
 enum {
     Num = 128, Char, NamedStr, UnnamedStr, Array, Func,
-    Else, If, Return, While, Print,Puts, Read, Continue, Break, Call,
+    Else, If, Return, While, Print,Puts, Read, ReadStr, Continue, Break, Call,
     Assign, OR, AND, Equal, Sym, FuncSym, ArraySym, Void,
     Nequal, LessEqual, GreatEqual
 };
@@ -655,7 +656,6 @@ static double statement() {
             exit(1);
         }
 
-        printf("Execute the shell command: %s.\n", cmd);
         int res = shellcall(cmd, token_val.ptr->pointer.funcp, CMD_OUT_BUF_LENGTH);
         switch (res) {
             case shellcall_failed:
@@ -665,11 +665,37 @@ static double statement() {
                 puts("Execution success, but the result may be truncated.");
                 break;
             case shellcall_success:
-                puts("Execution success.");
                 break;
             default:
                 assert(0);
         }
+        match(')');
+        match(';');
+    }
+    else if (token == ReadStr) {
+        match(token);
+        match('(');
+
+        if (token != Sym) {
+            release_symbol(token_val.ptr);
+        }
+        char *input = (char*)malloc(sizeof(char)*READ_STR_BUF_LENGTH);
+        token_val.ptr->pointer.funcp = input;
+        input[READ_STR_BUF_LENGTH - 1] = -1;
+        token_val.ptr->type = NamedStr;
+
+        int tokens2[] = {Sym, NamedStr, FuncSym, ArraySym};
+        match_multiple(tokens2, 4);
+
+        char *res = fgets(input, READ_STR_BUF_LENGTH, stdin);
+        if (res == NULL) {
+            puts("read string failed");
+            exit(0);
+        }
+        if (input[READ_STR_BUF_LENGTH - 1] == 0) {
+            puts("Warning: input is too long. It is truncated.\n");
+        }
+
         match(')');
         match(';');
     }
@@ -754,7 +780,7 @@ static void tryc_init() {
     currentlevel = 0;
     return_val = 0.0;
 
-    src = "array func else if return while print puts read continue break call";
+    src = "array func else if return while print puts read read_str continue break call";
     int i;
     for (i = Array; i <= Call; ++i) {
         next();
@@ -785,21 +811,32 @@ int tryc_exec(int argc, char** argv)
         }
     }
     if (argc < 1) {
-        printf("usage: tryc [-d] file ...\n");
-        return -1;
+        char *cur = src;
+        char *end = cur + POOLSIZE;
+        while ((*cur = fgetc(stdin)) != EOF && cur != end) {
+            ++cur;
+        }
+        if (cur == end) {
+            printf("Source file too large.\n");
+            return -1;
+        }
+        *cur = 0;
+        // printf("usage: tryc [-d] file ...\n");
+        // return -1;
     }
-
-    if ((fd = open(*argv, 0)) < 0) {                /* read the source file */
-        printf("could not open(%s)\n", *argv);
-        return -1;
+    else {
+        if ((fd = open(*argv, 0)) < 0) {                /* read the source file */
+            printf("could not open(%s)\n", *argv);
+            return -1;
+        }
+        int i;
+        if ((i = read(fd, src, POOLSIZE - 1)) <= 0) {
+            printf("read() returned %d\n", i);
+            return -1;
+        }
+        src[i] = 0; /* add EOF character */
+        close(fd);
     }
-    int i;
-    if ((i = read(fd, src, POOLSIZE - 1)) <= 0) {
-        printf("read() returned %d\n", i);
-        return -1;
-    }
-    src[i] = 0; /* add EOF character */
-    close(fd);
     next();
     while (token != 0) {
         statement();
