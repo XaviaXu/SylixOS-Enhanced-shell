@@ -1,68 +1,68 @@
 /*********************************************************************************************************
 **
-**                                    ÖĞ¹úÈí¼ş¿ªÔ´×éÖ¯
+**                                    ä¸­å›½è½¯ä»¶å¼€æºç»„ç»‡
 **
-**                                   Ç¶ÈëÊ½ÊµÊ±²Ù×÷ÏµÍ³
+**                                   åµŒå…¥å¼å®æ—¶æ“ä½œç³»ç»Ÿ
 **
 **                                SylixOS(TM)  LW : long wing
 **
 **                               Copyright All Rights Reserved
 **
-**--------------ÎÄ¼şĞÅÏ¢--------------------------------------------------------------------------------
+**--------------æ–‡ä»¶ä¿¡æ¯--------------------------------------------------------------------------------
 **
-** ÎÄ   ¼ş   Ãû: ttinyShellFsCmd.c
+** æ–‡   ä»¶   å: ttinyShellFsCmd.c
 **
-** ´´   ½¨   ÈË: Han.Hui (º«»Ô)
+** åˆ›   å»º   äºº: Han.Hui (éŸ©è¾‰)
 **
-** ÎÄ¼ş´´½¨ÈÕÆÚ: 2008 Äê 07 ÔÂ 27 ÈÕ
+** æ–‡ä»¶åˆ›å»ºæ—¥æœŸ: 2008 å¹´ 07 æœˆ 27 æ—¥
 **
-** Ãè        Êö: ÏµÍ³ÄÚ²¿ÃüÁî¶¨Òå (ÎÄ¼şÏµÍ³Ïà¹Ø).
+** æ        è¿°: ç³»ç»Ÿå†…éƒ¨å‘½ä»¤å®šä¹‰ (æ–‡ä»¶ç³»ç»Ÿç›¸å…³).
 
 ** BUG
-2008.11.11  __tshellFsCmdCp() ²»ÄÜÒÔÄ¿Â¼ÎÄ¼ş×÷ÎªÔ´ÎÄ¼ş.
-2008.12.04  mv ÒÆ¶¯ÎÄ¼şÊ±, ²»ÔÚÍ¬Ò»¸ö¾í, ĞèÒª½øĞĞ¸´ÖÆ, É¾³ı²Ù×÷.
-2009.02.25  touch ´´½¨µÄĞÂÎÄ¼ş´óĞ¡ÎªÁã.
-2009.02.21  ĞŞ¸ÄÁË ls ºÍ attrib Õë¶Ô·Çµ±Ç°Ä¿Â¼µÄ´¦Àí.
-2009.03.10  cp ÎÄ¼şÊ±ĞèÒªÍ¬²½ÎÄ¼şÊ±¼ä.
-2009.03.11  ls ºÍ attrib ÃüÁîµÄ¶ÔÎÄ¼şµÄ´óĞ¡´òÓ¡ÓĞÎó.
-2009.03.14  ¼ÓÈë¶Ô df Ö¸ÁîµÄÖ§³Ö.
-2009.03.21  ½« attrib ÃüÁî¸ÄÎª ll.
-            cp ÃüÁîµÄ»º³åÇø¸ù¾İÎÄ¼ş´óĞ¡×ÔÊÊÓ¦.
-2009.05.19  mv ÒªÒÔÖ»Ğ´·½Ê½´ò¿ªÎÄ¼ş.
-2009.06.30  cp ÃüÁîĞèÒªÒÔ O_TRUNC ´ò¿ªÎÄ¼ş.
-2009.07.03  ĞŞÕıÁË GCC ±àÒëÊ±µÄ¾¯¸æ.
-2009.07.04  ¼ÓÈë shfile Ö¸Áî, ÓÃÀ´Ö´ĞĞÖ¸¶¨µÄ shell ÃüÁî¼¯ÎÄ¼ş.
-2009.07.08  mv ²Ù×÷Ê±µ±Ä¿±ê´æÔÚÊ±, ĞèÒªÌáÊ¾.
-2009.07.28  µ± mv Ê§°ÜÊ±, Ö±½Ó½øĞĞ cp ºÍ rm ÁªºÏ²Ù×÷.
-2009.08.27  ls ºÍ ll µ±Óöµ½ stat() ´íÎóÊ±, Ê¹ÓÃÄ¬ÈÏÊôĞÔÏÔÊ¾.
-2009.09.01  ĞŞÕıÁË ls ll ÃüÁî¶Ô²ÎÊıÄ¿Â¼½áÎ²¼ÓÈë / ×Ö·ûÊ±³öÏÖµÄ´íÎó.
-2009.10.02  ÎŞ·¨»ñÈ¡ stat µÄÎÄ¼şÄ¬ÈÏÎª×Ö·ûÀàĞÍÎÄ¼ş.
-2009.11.18  ¸üĞÂ df ÏÔÊ¾.
-2009.12.14  __tshellFsCmdLl() Ö§³Ö´òÓ¡ĞŞ¸ÄÊ±¼ä.
-            ¼ò»¯ ls ÃüÁîµÄ´òÓ¡ÄÚÈİ.
-            ¼ÓÈë mount ²Ù×÷.
-2009.12.15  ¼ÓÈë symbol link ÎÄ¼ş²Ù×÷.
-            ĞŞÕı¿½±´ÎÄ¼ş³É¹¦ÅĞ¶ÏµÄÒ»´¦ bug.
-2009.12.29  ll ÃüÁîÎÄ¼şÊôĞÔµÚÒ»¸ö×Ö·ûÏÔÊ¾¸ü¼ÓÏê¾¡.
-2010.09.10  ls ÃüÁîµ± d_type != DT_UNKNOWN Ê±, ²»ĞèÒªµ÷ÓÃ stat() º¯Êı.
-2011.03.04  cat ÃüÁîÖ§³ÖÖĞ¼ä´ò¶Ï.
-2011.03.22  ls ÃüÁîÁ´½ÓÎÄ¼ş×ÏÉ«×ÖÌå.
-2011.03.27  ¼ÓÈë mkfifo ÃüÁî.
-2011.05.16  __tshellFsCmdMv() Ê¹ÓÃ rename() Ìæ»» ioctl(... FIOMOVE ...) ·½Ê½. 
-2011.06.03  ¼ÓÈë varload Óë varsave ¹¦ÄÜ.
-2011.06.23  Ê¹ÓÃĞÂµÄÉ«²Ê×ªÒå.
-2011.08.07  __tshellFsCmdLl() Ö§³ÖÏÔÊ¾Á´½ÓÎÄ¼şÄ¿±êµÄ¹¦ÄÜ.
-2011.11.17  cat ÃüÁî²»ÄÜ´òÓ¡·Ç reg ÎÄ¼ş.
-2012.03.25  cd ºÍ ch ÃüÁîĞèÒªÓĞ stat ÅĞ¶Ï.
-2012.10.20  ¼ÓÈëÒ»¸ö tmpname ÃüÁî.
-2012.10.25  cd ÃüÁîÊ¹ÓÃ chdir() ÊµÏÖ.
-2013.01.22  ll ¼ÓÈë¶ÔÎÄ¼şËùÓĞÕßµÄÏÔÊ¾, chmod ¼ÓÈë¶ÔÍ¨Åä·ûµÄÖ§³Ö.
-2013.04.01  ĞŞÕı GCC 4.7.3 Òı·¢µÄĞÂ warning.
-2013.06.24  ¼ÓÈë¶Ô vfat ¾í±êµÄÖ§³Ö.
-2014.05.30  ¼ÓÈë²é¿´ÎÄ¼ş¼Ğ´óĞ¡µÄÃüÁî.
-2014.10.10  cp ÃüÁî½«Ä¿±êÎÄ¼şÉèÖÃÎªÓëÔ­Ê¼ÎÄ¼şÏàÍ¬µÄ mode.
-2014.10.29  ls ÏÔÊ¾µÄµ¥ĞĞ¿í¶ÈÍ¨¹ı TIOCGWINSZ »ñÈ¡.
-2014.12.08  ln Ö§³Ö -f Ñ¡Ïî.
+2008.11.11  __tshellFsCmdCp() ä¸èƒ½ä»¥ç›®å½•æ–‡ä»¶ä½œä¸ºæºæ–‡ä»¶.
+2008.12.04  mv ç§»åŠ¨æ–‡ä»¶æ—¶, ä¸åœ¨åŒä¸€ä¸ªå·, éœ€è¦è¿›è¡Œå¤åˆ¶, åˆ é™¤æ“ä½œ.
+2009.02.25  touch åˆ›å»ºçš„æ–°æ–‡ä»¶å¤§å°ä¸ºé›¶.
+2009.02.21  ä¿®æ”¹äº† ls å’Œ attrib é’ˆå¯¹éå½“å‰ç›®å½•çš„å¤„ç†.
+2009.03.10  cp æ–‡ä»¶æ—¶éœ€è¦åŒæ­¥æ–‡ä»¶æ—¶é—´.
+2009.03.11  ls å’Œ attrib å‘½ä»¤çš„å¯¹æ–‡ä»¶çš„å¤§å°æ‰“å°æœ‰è¯¯.
+2009.03.14  åŠ å…¥å¯¹ df æŒ‡ä»¤çš„æ”¯æŒ.
+2009.03.21  å°† attrib å‘½ä»¤æ”¹ä¸º ll.
+            cp å‘½ä»¤çš„ç¼“å†²åŒºæ ¹æ®æ–‡ä»¶å¤§å°è‡ªé€‚åº”.
+2009.05.19  mv è¦ä»¥åªå†™æ–¹å¼æ‰“å¼€æ–‡ä»¶.
+2009.06.30  cp å‘½ä»¤éœ€è¦ä»¥ O_TRUNC æ‰“å¼€æ–‡ä»¶.
+2009.07.03  ä¿®æ­£äº† GCC ç¼–è¯‘æ—¶çš„è­¦å‘Š.
+2009.07.04  åŠ å…¥ shfile æŒ‡ä»¤, ç”¨æ¥æ‰§è¡ŒæŒ‡å®šçš„ shell å‘½ä»¤é›†æ–‡ä»¶.
+2009.07.08  mv æ“ä½œæ—¶å½“ç›®æ ‡å­˜åœ¨æ—¶, éœ€è¦æç¤º.
+2009.07.28  å½“ mv å¤±è´¥æ—¶, ç›´æ¥è¿›è¡Œ cp å’Œ rm è”åˆæ“ä½œ.
+2009.08.27  ls å’Œ ll å½“é‡åˆ° stat() é”™è¯¯æ—¶, ä½¿ç”¨é»˜è®¤å±æ€§æ˜¾ç¤º.
+2009.09.01  ä¿®æ­£äº† ls ll å‘½ä»¤å¯¹å‚æ•°ç›®å½•ç»“å°¾åŠ å…¥ / å­—ç¬¦æ—¶å‡ºç°çš„é”™è¯¯.
+2009.10.02  æ— æ³•è·å– stat çš„æ–‡ä»¶é»˜è®¤ä¸ºå­—ç¬¦ç±»å‹æ–‡ä»¶.
+2009.11.18  æ›´æ–° df æ˜¾ç¤º.
+2009.12.14  __tshellFsCmdLl() æ”¯æŒæ‰“å°ä¿®æ”¹æ—¶é—´.
+            ç®€åŒ– ls å‘½ä»¤çš„æ‰“å°å†…å®¹.
+            åŠ å…¥ mount æ“ä½œ.
+2009.12.15  åŠ å…¥ symbol link æ–‡ä»¶æ“ä½œ.
+            ä¿®æ­£æ‹·è´æ–‡ä»¶æˆåŠŸåˆ¤æ–­çš„ä¸€å¤„ bug.
+2009.12.29  ll å‘½ä»¤æ–‡ä»¶å±æ€§ç¬¬ä¸€ä¸ªå­—ç¬¦æ˜¾ç¤ºæ›´åŠ è¯¦å°½.
+2010.09.10  ls å‘½ä»¤å½“ d_type != DT_UNKNOWN æ—¶, ä¸éœ€è¦è°ƒç”¨ stat() å‡½æ•°.
+2011.03.04  cat å‘½ä»¤æ”¯æŒä¸­é—´æ‰“æ–­.
+2011.03.22  ls å‘½ä»¤é“¾æ¥æ–‡ä»¶ç´«è‰²å­—ä½“.
+2011.03.27  åŠ å…¥ mkfifo å‘½ä»¤.
+2011.05.16  __tshellFsCmdMv() ä½¿ç”¨ rename() æ›¿æ¢ ioctl(... FIOMOVE ...) æ–¹å¼. 
+2011.06.03  åŠ å…¥ varload ä¸ varsave åŠŸèƒ½.
+2011.06.23  ä½¿ç”¨æ–°çš„è‰²å½©è½¬ä¹‰.
+2011.08.07  __tshellFsCmdLl() æ”¯æŒæ˜¾ç¤ºé“¾æ¥æ–‡ä»¶ç›®æ ‡çš„åŠŸèƒ½.
+2011.11.17  cat å‘½ä»¤ä¸èƒ½æ‰“å°é reg æ–‡ä»¶.
+2012.03.25  cd å’Œ ch å‘½ä»¤éœ€è¦æœ‰ stat åˆ¤æ–­.
+2012.10.20  åŠ å…¥ä¸€ä¸ª tmpname å‘½ä»¤.
+2012.10.25  cd å‘½ä»¤ä½¿ç”¨ chdir() å®ç°.
+2013.01.22  ll åŠ å…¥å¯¹æ–‡ä»¶æ‰€æœ‰è€…çš„æ˜¾ç¤º, chmod åŠ å…¥å¯¹é€šé…ç¬¦çš„æ”¯æŒ.
+2013.04.01  ä¿®æ­£ GCC 4.7.3 å¼•å‘çš„æ–° warning.
+2013.06.24  åŠ å…¥å¯¹ vfat å·æ ‡çš„æ”¯æŒ.
+2014.05.30  åŠ å…¥æŸ¥çœ‹æ–‡ä»¶å¤¹å¤§å°çš„å‘½ä»¤.
+2014.10.10  cp å‘½ä»¤å°†ç›®æ ‡æ–‡ä»¶è®¾ç½®ä¸ºä¸åŸå§‹æ–‡ä»¶ç›¸åŒçš„ mode.
+2014.10.29  ls æ˜¾ç¤ºçš„å•è¡Œå®½åº¦é€šè¿‡ TIOCGWINSZ è·å–.
+2014.12.08  ln æ”¯æŒ -f é€‰é¡¹.
 *********************************************************************************************************/
 #define  __SYLIXOS_STDIO
 #define  __SYLIXOS_KERNEL
@@ -71,7 +71,7 @@
 #include "../SylixOS/shell/include/ttiny_shell.h"
 #include "sys/ioctl.h"
 /*********************************************************************************************************
-  ²Ã¼ô¿ØÖÆ
+  è£å‰ªæ§åˆ¶
 *********************************************************************************************************/
 #if LW_CFG_SHELL_EN > 0 && LW_CFG_MAX_VOLUMES > 0
 #include "../SylixOS/shell/ttinyShell/ttinyShell.h"
@@ -86,18 +86,18 @@
 #include "../SylixOS/shell/commands/find.h"
 
 /*********************************************************************************************************
-  º¯ÊıÉùÃ÷
+  å‡½æ•°å£°æ˜
 *********************************************************************************************************/
 static INT      __tshellFsCmdCp(INT  iArgC, PCHAR  ppcArgV[]);
 LW_API time_t   API_RootFsTime(time_t  *time);
 /*********************************************************************************************************
-** º¯ÊıÃû³Æ: __tshellFsCmdCd
-** ¹¦ÄÜÃèÊö: ÏµÍ³ÃüÁî "cd"
-** Êä¡¡Èë  : iArgC         ²ÎÊı¸öÊı
-**           ppcArgV       ²ÎÊı±í
-** Êä¡¡³ö  : 0
-** È«¾Ö±äÁ¿: 
-** µ÷ÓÃÄ£¿é: 
+** å‡½æ•°åç§°: __tshellFsCmdCd
+** åŠŸèƒ½æè¿°: ç³»ç»Ÿå‘½ä»¤ "cd"
+** è¾“ã€€å…¥  : iArgC         å‚æ•°ä¸ªæ•°
+**           ppcArgV       å‚æ•°è¡¨
+** è¾“ã€€å‡º  : 0
+** å…¨å±€å˜é‡: 
+** è°ƒç”¨æ¨¡å—: 
 *********************************************************************************************************/
 static INT  __tshellFsCmdCd (INT  iArgC, PCHAR  ppcArgV[])
 {
@@ -152,13 +152,13 @@ static INT  __tshellFsCmdCd (INT  iArgC, PCHAR  ppcArgV[])
     return  (ERROR_NONE);
 }
 /*********************************************************************************************************
-** º¯ÊıÃû³Æ: __tshellFsCmdCh
-** ¹¦ÄÜÃèÊö: ÏµÍ³ÃüÁî "ch"
-** Êä¡¡Èë  : iArgC         ²ÎÊı¸öÊı
-**           ppcArgV       ²ÎÊı±í
-** Êä¡¡³ö  : 0
-** È«¾Ö±äÁ¿: 
-** µ÷ÓÃÄ£¿é: 
+** å‡½æ•°åç§°: __tshellFsCmdCh
+** åŠŸèƒ½æè¿°: ç³»ç»Ÿå‘½ä»¤ "ch"
+** è¾“ã€€å…¥  : iArgC         å‚æ•°ä¸ªæ•°
+**           ppcArgV       å‚æ•°è¡¨
+** è¾“ã€€å‡º  : 0
+** å…¨å±€å˜é‡: 
+** è°ƒç”¨æ¨¡å—: 
 *********************************************************************************************************/
 static INT  __tshellFsCmdCh (INT  iArgC, PCHAR  ppcArgV[])
 {
@@ -184,13 +184,13 @@ static INT  __tshellFsCmdCh (INT  iArgC, PCHAR  ppcArgV[])
     return  (ERROR_NONE);
 }
 /*********************************************************************************************************
-** º¯ÊıÃû³Æ: __tshellFsCmdPwd
-** ¹¦ÄÜÃèÊö: ÏµÍ³ÃüÁî "pwd"
-** Êä¡¡Èë  : iArgC         ²ÎÊı¸öÊı
-**           ppcArgV       ²ÎÊı±í
-** Êä¡¡³ö  : 0
-** È«¾Ö±äÁ¿: 
-** µ÷ÓÃÄ£¿é: 
+** å‡½æ•°åç§°: __tshellFsCmdPwd
+** åŠŸèƒ½æè¿°: ç³»ç»Ÿå‘½ä»¤ "pwd"
+** è¾“ã€€å…¥  : iArgC         å‚æ•°ä¸ªæ•°
+**           ppcArgV       å‚æ•°è¡¨
+** è¾“ã€€å‡º  : 0
+** å…¨å±€å˜é‡: 
+** è°ƒç”¨æ¨¡å—: 
 *********************************************************************************************************/
 static INT  __tshellFsCmdPwd (INT  iArgC, PCHAR  ppcArgV[])
 {
@@ -203,13 +203,13 @@ static INT  __tshellFsCmdPwd (INT  iArgC, PCHAR  ppcArgV[])
     return  (ERROR_NONE);
 }
 /*********************************************************************************************************
-** º¯ÊıÃû³Æ: __tshellFsCmdTmpname
-** ¹¦ÄÜÃèÊö: ÏµÍ³ÃüÁî "tmpname"
-** Êä¡¡Èë  : iArgC         ²ÎÊı¸öÊı
-**           ppcArgV       ²ÎÊı±í
-** Êä¡¡³ö  : 0
-** È«¾Ö±äÁ¿: 
-** µ÷ÓÃÄ£¿é: 
+** å‡½æ•°åç§°: __tshellFsCmdTmpname
+** åŠŸèƒ½æè¿°: ç³»ç»Ÿå‘½ä»¤ "tmpname"
+** è¾“ã€€å…¥  : iArgC         å‚æ•°ä¸ªæ•°
+**           ppcArgV       å‚æ•°è¡¨
+** è¾“ã€€å‡º  : 0
+** å…¨å±€å˜é‡: 
+** è°ƒç”¨æ¨¡å—: 
 *********************************************************************************************************/
 static INT  __tshellFsCmdTmpname (INT  iArgC, PCHAR  ppcArgV[])
 {
@@ -220,13 +220,13 @@ static INT  __tshellFsCmdTmpname (INT  iArgC, PCHAR  ppcArgV[])
     return  (ERROR_NONE);
 }
 /*********************************************************************************************************
-** º¯ÊıÃû³Æ: __tshellFsCmdMkdir
-** ¹¦ÄÜÃèÊö: ÏµÍ³ÃüÁî "mkdir"
-** Êä¡¡Èë  : iArgC         ²ÎÊı¸öÊı
-**           ppcArgV       ²ÎÊı±í
-** Êä¡¡³ö  : 0
-** È«¾Ö±äÁ¿: 
-** µ÷ÓÃÄ£¿é: 
+** å‡½æ•°åç§°: __tshellFsCmdMkdir
+** åŠŸèƒ½æè¿°: ç³»ç»Ÿå‘½ä»¤ "mkdir"
+** è¾“ã€€å…¥  : iArgC         å‚æ•°ä¸ªæ•°
+**           ppcArgV       å‚æ•°è¡¨
+** è¾“ã€€å‡º  : 0
+** å…¨å±€å˜é‡: 
+** è°ƒç”¨æ¨¡å—: 
 *********************************************************************************************************/
 static INT  __tshellFsCmdMkdir (INT  iArgC, PCHAR  ppcArgV[])
 {
@@ -249,13 +249,13 @@ static INT  __tshellFsCmdMkdir (INT  iArgC, PCHAR  ppcArgV[])
     return  (iError);
 }
 /*********************************************************************************************************
-** º¯ÊıÃû³Æ: __tshellFsCmdMkfifo
-** ¹¦ÄÜÃèÊö: ÏµÍ³ÃüÁî "mkfifo"
-** Êä¡¡Èë  : iArgC         ²ÎÊı¸öÊı
-**           ppcArgV       ²ÎÊı±í
-** Êä¡¡³ö  : 0
-** È«¾Ö±äÁ¿: 
-** µ÷ÓÃÄ£¿é: 
+** å‡½æ•°åç§°: __tshellFsCmdMkfifo
+** åŠŸèƒ½æè¿°: ç³»ç»Ÿå‘½ä»¤ "mkfifo"
+** è¾“ã€€å…¥  : iArgC         å‚æ•°ä¸ªæ•°
+**           ppcArgV       å‚æ•°è¡¨
+** è¾“ã€€å‡º  : 0
+** å…¨å±€å˜é‡: 
+** è°ƒç”¨æ¨¡å—: 
 *********************************************************************************************************/
 static INT  __tshellFsCmdMkfifo (INT  iArgC, PCHAR  ppcArgV[])
 {
@@ -278,13 +278,13 @@ static INT  __tshellFsCmdMkfifo (INT  iArgC, PCHAR  ppcArgV[])
     return  (iError);
 }
 /*********************************************************************************************************
-** º¯ÊıÃû³Æ: __tshellFsCmdRmdir
-** ¹¦ÄÜÃèÊö: ÏµÍ³ÃüÁî "rmdir"
-** Êä¡¡Èë  : iArgC         ²ÎÊı¸öÊı
-**           ppcArgV       ²ÎÊı±í
-** Êä¡¡³ö  : 0
-** È«¾Ö±äÁ¿: 
-** µ÷ÓÃÄ£¿é: 
+** å‡½æ•°åç§°: __tshellFsCmdRmdir
+** åŠŸèƒ½æè¿°: ç³»ç»Ÿå‘½ä»¤ "rmdir"
+** è¾“ã€€å…¥  : iArgC         å‚æ•°ä¸ªæ•°
+**           ppcArgV       å‚æ•°è¡¨
+** è¾“ã€€å‡º  : 0
+** å…¨å±€å˜é‡: 
+** è°ƒç”¨æ¨¡å—: 
 *********************************************************************************************************/
 static INT  __tshellFsCmdRmdir (INT  iArgC, PCHAR  ppcArgV[])
 {
@@ -307,13 +307,13 @@ static INT  __tshellFsCmdRmdir (INT  iArgC, PCHAR  ppcArgV[])
     return  (iError);
 }
 /*********************************************************************************************************
-** º¯ÊıÃû³Æ: __tshellFsCmdRm
-** ¹¦ÄÜÃèÊö: ÏµÍ³ÃüÁî "rm"
-** Êä¡¡Èë  : iArgC         ²ÎÊı¸öÊı
-**           ppcArgV       ²ÎÊı±í
-** Êä¡¡³ö  : 0
-** È«¾Ö±äÁ¿: 
-** µ÷ÓÃÄ£¿é: 
+** å‡½æ•°åç§°: __tshellFsCmdRm
+** åŠŸèƒ½æè¿°: ç³»ç»Ÿå‘½ä»¤ "rm"
+** è¾“ã€€å…¥  : iArgC         å‚æ•°ä¸ªæ•°
+**           ppcArgV       å‚æ•°è¡¨
+** è¾“ã€€å‡º  : 0
+** å…¨å±€å˜é‡: 
+** è°ƒç”¨æ¨¡å—: 
 *********************************************************************************************************/
 static INT  __tshellFsCmdRm (INT  iArgC, PCHAR  ppcArgV[])
 {
@@ -358,13 +358,13 @@ static INT  __tshellFsCmdRm (INT  iArgC, PCHAR  ppcArgV[])
     return  (iError);
 }
 /*********************************************************************************************************
-** º¯ÊıÃû³Æ: __tshellFsCmdMv
-** ¹¦ÄÜÃèÊö: ÏµÍ³ÃüÁî "mv"
-** Êä¡¡Èë  : iArgC         ²ÎÊı¸öÊı
-**           ppcArgV       ²ÎÊı±í
-** Êä¡¡³ö  : 0
-** È«¾Ö±äÁ¿: 
-** µ÷ÓÃÄ£¿é: 
+** å‡½æ•°åç§°: __tshellFsCmdMv
+** åŠŸèƒ½æè¿°: ç³»ç»Ÿå‘½ä»¤ "mv"
+** è¾“ã€€å…¥  : iArgC         å‚æ•°ä¸ªæ•°
+**           ppcArgV       å‚æ•°è¡¨
+** è¾“ã€€å‡º  : 0
+** å…¨å±€å˜é‡: 
+** è°ƒç”¨æ¨¡å—: 
 *********************************************************************************************************/
 static INT  __tshellFsCmdMv (INT  iArgC, PCHAR  ppcArgV[])
 {
@@ -384,20 +384,20 @@ static INT  __tshellFsCmdMv (INT  iArgC, PCHAR  ppcArgV[])
         return  (-ERROR_TSHELL_EPARAM);
     }
     
-    iError = access(ppcArgV[2], 0);                                     /*  ¼ì²âÄ¿±êÎÄ¼şÊÇ·ñ´æÔÚ        */
+    iError = access(ppcArgV[2], 0);                                     /*  æ£€æµ‹ç›®æ ‡æ–‡ä»¶æ˜¯å¦å­˜åœ¨        */
     if (iError != PX_ERROR) {
 __re_select:
         printf("destination file is exist, overwrite? (Y/N)\n");
         read(0, cTemp, 16);
         if ((cTemp[0] == 'N') ||
-            (cTemp[0] == 'n')) {                                        /*  ²»¸²¸Ç                      */
+            (cTemp[0] == 'n')) {                                        /*  ä¸è¦†ç›–                      */
             goto    __error_handle;
         } else if ((cTemp[0] == 'Y') ||
-                   (cTemp[0] == 'y')) {                                 /*  ¸²¸Ç                        */
+                   (cTemp[0] == 'y')) {                                 /*  è¦†ç›–                        */
             if (stat(ppcArgV[2], &statGet)) {
                 goto    __error_handle;
             }
-            if (S_ISDIR(statGet.st_mode)) {                             /*  ²»ÔÊĞí¸²¸ÇÄ¿Â¼              */
+            if (S_ISDIR(statGet.st_mode)) {                             /*  ä¸å…è®¸è¦†ç›–ç›®å½•              */
                 fprintf(stderr, "Error: %s is an existing directory!\n", ppcArgV[2]);
                 goto    __error_handle;
             }
@@ -405,16 +405,16 @@ __re_select:
                 goto    __error_handle;
             }
         } else {
-            goto    __re_select;                                        /*  Ñ¡Ôñ´íÎó                    */
+            goto    __re_select;                                        /*  é€‰æ‹©é”™è¯¯                    */
         }
     }
-    close(iFd);                                                         /*  ¹Ø±ÕÔ´ÎÄ¼ş                  */
+    close(iFd);                                                         /*  å…³é—­æºæ–‡ä»¶                  */
     
     iError = rename(ppcArgV[1], ppcArgV[2]);
     if (iError < 0) {
-        iError = __tshellFsCmdCp(3, ppcArgV);                           /*  ĞèÒª½øĞĞ¿½±´É¾³ı            */
+        iError = __tshellFsCmdCp(3, ppcArgV);                           /*  éœ€è¦è¿›è¡Œæ‹·è´åˆ é™¤            */
         if (iError >= 0) {
-            __tshellFsCmdRm(2, ppcArgV);                                /*  É¾³ıÔ´ÎÄ¼ş                  */
+            __tshellFsCmdRm(2, ppcArgV);                                /*  åˆ é™¤æºæ–‡ä»¶                  */
         }
     }
     return  (iError);
@@ -424,13 +424,13 @@ __error_handle:
     return  (PX_ERROR);
 }
 /*********************************************************************************************************
-** º¯ÊıÃû³Æ: __tshellFsCmdCat
-** ¹¦ÄÜÃèÊö: ÏµÍ³ÃüÁî "cat"
-** Êä¡¡Èë  : iArgC         ²ÎÊı¸öÊı
-**           ppcArgV       ²ÎÊı±í
-** Êä¡¡³ö  : 0
-** È«¾Ö±äÁ¿: 
-** µ÷ÓÃÄ£¿é: 
+** å‡½æ•°åç§°: __tshellFsCmdCat
+** åŠŸèƒ½æè¿°: ç³»ç»Ÿå‘½ä»¤ "cat"
+** è¾“ã€€å…¥  : iArgC         å‚æ•°ä¸ªæ•°
+**           ppcArgV       å‚æ•°è¡¨
+** è¾“ã€€å‡º  : 0
+** å…¨å±€å˜é‡: 
+** è°ƒç”¨æ¨¡å—: 
 *********************************************************************************************************/
 static INT  __tshellFsCmdCat (INT  iArgC, PCHAR  ppcArgV[])
 {
@@ -488,19 +488,19 @@ static INT  __tshellFsCmdCat (INT  iArgC, PCHAR  ppcArgV[])
     return  (ERROR_NONE);
 }
 /*********************************************************************************************************
-** º¯ÊıÃû³Æ: __checkIsTime
-** ¹¦ÄÜÃèÊö: ¼ì²é×Ö´®ÊÇ·ñÎªÊ±¼ä
-** Êä¡¡Èë  : pcStr         ×Ö·û´®
-**           time          Ê±¼ä
-** Êä¡¡³ö  : 0  ±íÊ¾×ª»»ÕıÈ·
-**           -1 ±íÊ¾´íÎó
-** È«¾Ö±äÁ¿: 
-** µ÷ÓÃÄ£¿é: 
+** å‡½æ•°åç§°: __checkIsTime
+** åŠŸèƒ½æè¿°: æ£€æŸ¥å­—ä¸²æ˜¯å¦ä¸ºæ—¶é—´
+** è¾“ã€€å…¥  : pcStr         å­—ç¬¦ä¸²
+**           time          æ—¶é—´
+** è¾“ã€€å‡º  : 0  è¡¨ç¤ºè½¬æ¢æ­£ç¡®
+**           -1 è¡¨ç¤ºé”™è¯¯
+** å…¨å±€å˜é‡: 
+** è°ƒç”¨æ¨¡å—: 
 *********************************************************************************************************/
 static INT  __checkIsTime (PCHAR  pcStr, time_t  *time)
 {
     /*
-     *  ÕâÀïÄ¿Ç°²»´¦ÀíÊ±¼ä
+     *  è¿™é‡Œç›®å‰ä¸å¤„ç†æ—¶é—´
      */
     if (lib_strlen(pcStr) == 10) {
     }
@@ -511,13 +511,13 @@ static INT  __checkIsTime (PCHAR  pcStr, time_t  *time)
     return  (-1);
 }
 /*********************************************************************************************************
-** º¯ÊıÃû³Æ: __tshellFsCmdTouch
-** ¹¦ÄÜÃèÊö: ÏµÍ³ÃüÁî "touch"
-** Êä¡¡Èë  : iArgC         ²ÎÊı¸öÊı
-**           ppcArgV       ²ÎÊı±í
-** Êä¡¡³ö  : 0
-** È«¾Ö±äÁ¿: 
-** µ÷ÓÃÄ£¿é: 
+** å‡½æ•°åç§°: __tshellFsCmdTouch
+** åŠŸèƒ½æè¿°: ç³»ç»Ÿå‘½ä»¤ "touch"
+** è¾“ã€€å…¥  : iArgC         å‚æ•°ä¸ªæ•°
+**           ppcArgV       å‚æ•°è¡¨
+** è¾“ã€€å‡º  : 0
+** å…¨å±€å˜é‡: 
+** è°ƒç”¨æ¨¡å—: 
 *********************************************************************************************************/
 static INT  __tshellFsCmdTouch (INT  iArgC, PCHAR  ppcArgV[])
 {
@@ -536,13 +536,13 @@ static INT  __tshellFsCmdTouch (INT  iArgC, PCHAR  ppcArgV[])
     while ((iOc = getopt(iArgC, ppcArgV, "amc")) != -1) {
         switch (iOc) {
         case 'a':
-            iAflag = 1;                                                 /*  Ö»¸Ä±ä·ÃÎÊÊ±¼ä              */
+            iAflag = 1;                                                 /*  åªæ”¹å˜è®¿é—®æ—¶é—´              */
             break;
         case 'm':
-            iMflag = 1;                                                 /*  Ö»¸Ä±äĞŞ¸ÄÊ±¼ä              */
+            iMflag = 1;                                                 /*  åªæ”¹å˜ä¿®æ”¹æ—¶é—´              */
             break;
         case 'c':
-            iCflag = 1;                                                 /*  ÈôÎÄ¼ş²»´æÔÚ£¬²»´´½¨Ëü      */
+            iCflag = 1;                                                 /*  è‹¥æ–‡ä»¶ä¸å­˜åœ¨ï¼Œä¸åˆ›å»ºå®ƒ      */
             break;
         }
     }
@@ -561,7 +561,7 @@ static INT  __tshellFsCmdTouch (INT  iArgC, PCHAR  ppcArgV[])
         return  (-ERROR_TSHELL_EPARAM);
     }
     
-    (VOID)iAflag;                                                       /*  ÔİÊ±²»Ê¹ÓÃ                  */
+    (VOID)iAflag;                                                       /*  æš‚æ—¶ä¸ä½¿ç”¨                  */
     (VOID)iMflag;
     
     if ((iCflag == 0) && (access(ppcArgV[iFileNameIndex], R_OK) < 0)) {
@@ -580,33 +580,33 @@ static INT  __tshellFsCmdTouch (INT  iArgC, PCHAR  ppcArgV[])
     return  (ERROR_NONE);
 }
 /*********************************************************************************************************
-** º¯ÊıÃû³Æ: __fillWhite
-** ¹¦ÄÜÃèÊö: ²¹³äÈô¸É¸ö¿Õ¸ñ
-** Êä¡¡Èë  : stLen      ¿Õ¸ñµÄ³¤¶È
-** Êä¡¡³ö  : 0
-** È«¾Ö±äÁ¿: 
-** µ÷ÓÃÄ£¿é: 
+** å‡½æ•°åç§°: __fillWhite
+** åŠŸèƒ½æè¿°: è¡¥å……è‹¥å¹²ä¸ªç©ºæ ¼
+** è¾“ã€€å…¥  : stLen      ç©ºæ ¼çš„é•¿åº¦
+** è¾“ã€€å‡º  : 0
+** å…¨å±€å˜é‡: 
+** è°ƒç”¨æ¨¡å—: 
 *********************************************************************************************************/
 static VOID  __fillWhite (size_t  stLen)
 {
     CHAR    cFmt[16];
     
     sprintf(cFmt, "%%-%zds", stLen);
-    printf(cFmt, "");                                                   /*  ²¹³ä¿Õ¸ñ                    */
+    printf(cFmt, "");                                                   /*  è¡¥å……ç©ºæ ¼                    */
 }
 /*********************************************************************************************************
-** º¯ÊıÃû³Æ: __tshellFsCmdLs
-** ¹¦ÄÜÃèÊö: ÏµÍ³ÃüÁî "ls"
-** Êä¡¡Èë  : iArgC         ²ÎÊı¸öÊı
-**           ppcArgV       ²ÎÊı±í
-** Êä¡¡³ö  : 0
-** È«¾Ö±äÁ¿: 
-** µ÷ÓÃÄ£¿é: 
+** å‡½æ•°åç§°: __tshellFsCmdLs
+** åŠŸèƒ½æè¿°: ç³»ç»Ÿå‘½ä»¤ "ls"
+** è¾“ã€€å…¥  : iArgC         å‚æ•°ä¸ªæ•°
+**           ppcArgV       å‚æ•°è¡¨
+** è¾“ã€€å‡º  : 0
+** å…¨å±€å˜é‡: 
+** è°ƒç”¨æ¨¡å—: 
 *********************************************************************************************************/
 static INT  __tshellFsCmdLs (INT  iArgC, PCHAR  ppcArgV[])
 {
-#define __TSHELL_BYTES_PERLINE          80                              /*  µ¥ĞĞ 80 ×Ö·û                */
-#define __TSHELL_BYTES_PERFILE          16                              /*  Ã¿¸öÎÄ¼şÃûÏÔÊ¾¸ñ³¤¶È        */
+#define __TSHELL_BYTES_PERLINE          80                              /*  å•è¡Œ 80 å­—ç¬¦                */
+#define __TSHELL_BYTES_PERFILE          16                              /*  æ¯ä¸ªæ–‡ä»¶åæ˜¾ç¤ºæ ¼é•¿åº¦        */
 
              CHAR            cDirName[MAX_FILENAME_LENGTH] = ".";
              size_t          stDirLen = 1;
@@ -627,17 +627,17 @@ static INT  __tshellFsCmdLs (INT  iArgC, PCHAR  ppcArgV[])
         return  (ERROR_NONE);
     }
     
-    if ((iArgC == 2) && lib_strcmp(ppcArgV[1], ".")) {                  /*  Ö¸¶¨Ä¿Â¼                    */
+    if ((iArgC == 2) && lib_strcmp(ppcArgV[1], ".")) {                  /*  æŒ‡å®šç›®å½•                    */
         lib_strcpy(cDirName, ppcArgV[1]);
         stDirLen = lib_strlen(cDirName);
         pdir     = opendir(cDirName);
         if (stDirLen > 0) {
-            if (cDirName[stDirLen - 1] != PX_DIVIDER) {                 /*  ²ÎÊıÄ¿Â¼²»ÊÇÒÔ / ½áÎ²       */
-                cDirName[stDirLen++] = PX_DIVIDER;                      /*  Ìí¼ÓÒ»¸ö /                  */
+            if (cDirName[stDirLen - 1] != PX_DIVIDER) {                 /*  å‚æ•°ç›®å½•ä¸æ˜¯ä»¥ / ç»“å°¾       */
+                cDirName[stDirLen++] = PX_DIVIDER;                      /*  æ·»åŠ ä¸€ä¸ª /                  */
             }
         }
     } else {
-        pdir = opendir(cDirName);                                       /*  µ±Ç°Ä¿Â¼                    */
+        pdir = opendir(cDirName);                                       /*  å½“å‰ç›®å½•                    */
     }
     
     if (!pdir) {
@@ -649,7 +649,7 @@ static INT  __tshellFsCmdLs (INT  iArgC, PCHAR  ppcArgV[])
         return  (PX_ERROR);
     }
     
-    if (ioctl(STD_OUT, TIOCGWINSZ, &winsz)) {                           /*  »ñµÃ´°¿ÚĞÅÏ¢                */
+    if (ioctl(STD_OUT, TIOCGWINSZ, &winsz)) {                           /*  è·å¾—çª—å£ä¿¡æ¯                */
         winsz.ws_col = __TSHELL_BYTES_PERLINE;
     } else {
         winsz.ws_col = (unsigned short)ROUND_DOWN(winsz.ws_col, __TSHELL_BYTES_PERFILE);
@@ -661,27 +661,27 @@ static INT  __tshellFsCmdLs (INT  iArgC, PCHAR  ppcArgV[])
             break;
         
         } else {
-            if ((pdirent->d_type == DT_UNKNOWN) ||                      /*  ÎŞ·¨»ñÈ¡ÎÄ¼şÀàĞÍ            */
-                (pdirent->d_type == DT_REG)) {                          /*  REG ÎÄ¼şĞèÒª»ñÈ¡¿ÉÖ´ĞĞĞÅÏ¢  */
+            if ((pdirent->d_type == DT_UNKNOWN) ||                      /*  æ— æ³•è·å–æ–‡ä»¶ç±»å‹            */
+                (pdirent->d_type == DT_REG)) {                          /*  REG æ–‡ä»¶éœ€è¦è·å–å¯æ‰§è¡Œä¿¡æ¯  */
                 if ((stDirLen > 1) || 
                     ((stDirLen == 1) && (cDirName[0] == PX_ROOT))) {
-                    lib_strcpy(&cDirName[stDirLen], pdirent->d_name);   /*  Á´½ÓÖ¸¶¨Ä¿Â¼                */
+                    lib_strcpy(&cDirName[stDirLen], pdirent->d_name);   /*  é“¾æ¥æŒ‡å®šç›®å½•                */
                     iError = stat(cDirName, &statGet);
                 } else {
-                    iError = stat(pdirent->d_name, &statGet);           /*  Ê¹ÓÃµ±Ç°Ä¿Â¼                */
+                    iError = stat(pdirent->d_name, &statGet);           /*  ä½¿ç”¨å½“å‰ç›®å½•                */
                 }
-                if (iError < 0) {                                       /*  Éè±¸ÎÄ¼şÄ¬ÈÏÊ¹ÓÃÏÂÃæµÄÊôĞÔ  */
-                    statGet.st_mode = S_IRUSR | S_IFREG;                /*  Ä¬ÈÏÊôĞÔ                    */
+                if (iError < 0) {                                       /*  è®¾å¤‡æ–‡ä»¶é»˜è®¤ä½¿ç”¨ä¸‹é¢çš„å±æ€§  */
+                    statGet.st_mode = S_IRUSR | S_IFREG;                /*  é»˜è®¤å±æ€§                    */
                 }
             } else {
                 statGet.st_mode = DTTOIF(pdirent->d_type);
             }
             
             API_TShellColorStart(pdirent->d_name, "", statGet.st_mode, STD_OUT);
-            stPrintLen = printf("%-15s ", pdirent->d_name);             /*  ´òÓ¡ÎÄ¼şÃû                  */
+            stPrintLen = printf("%s\t ", pdirent->d_name);             /*  æ‰“å°æ–‡ä»¶å                  */
             if (stPrintLen > __TSHELL_BYTES_PERFILE) {
                 stPad = ROUND_UP(stPrintLen, __TSHELL_BYTES_PERFILE)
-                      - stPrintLen;                                     /*  ¼ÆËãÌî³äÊıÁ¿                */
+                      - stPrintLen;                                     /*  è®¡ç®—å¡«å……æ•°é‡                */
                 __fillWhite(stPad);
             } else {
                 stPad = 0;
@@ -690,30 +690,30 @@ static INT  __tshellFsCmdLs (INT  iArgC, PCHAR  ppcArgV[])
             API_TShellColorEnd(STD_OUT);
             
             if (stTotalLen >= winsz.ws_col) {
-                printf("\n");                                           /*  »»ĞĞ                        */
+                printf("\n");                                           /*  æ¢è¡Œ                        */
                 stTotalLen = 0;
             }
         }
     } while (1);
     
     if (stTotalLen) {
-        printf("\n");                                                   /*  ½áÊø±¾ĞĞ                    */
+        printf("\n");                                                   /*  ç»“æŸæœ¬è¡Œ                    */
     }
     
-    closedir(pdir);                                                     /*  ¹Ø±ÕÎÄ¼ş¼Ğ                  */
+    closedir(pdir);                                                     /*  å…³é—­æ–‡ä»¶å¤¹                  */
     
     return  (ERROR_NONE);
 }
 /*********************************************************************************************************
-** º¯ÊıÃû³Æ: __tshellFsCmdCmp
-** ¹¦ÄÜÃèÊö: ÏµÍ³ÃüÁî "cmp"
-** Êä¡¡Èë  : iArgC         ²ÎÊı¸öÊı
-**           ppcArgV       ²ÎÊı±í
-** Êä¡¡³ö  : 0:  ÎÄ¼şÏàÍ¬
-**           1:  ÎÄ¼ş²»Í¬
-**           -1: ³öÏÖ´íÎó
-** È«¾Ö±äÁ¿: 
-** µ÷ÓÃÄ£¿é: 
+** å‡½æ•°åç§°: __tshellFsCmdCmp
+** åŠŸèƒ½æè¿°: ç³»ç»Ÿå‘½ä»¤ "cmp"
+** è¾“ã€€å…¥  : iArgC         å‚æ•°ä¸ªæ•°
+**           ppcArgV       å‚æ•°è¡¨
+** è¾“ã€€å‡º  : 0:  æ–‡ä»¶ç›¸åŒ
+**           1:  æ–‡ä»¶ä¸åŒ
+**           -1: å‡ºç°é”™è¯¯
+** å…¨å±€å˜é‡: 
+** è°ƒç”¨æ¨¡å—: 
 *********************************************************************************************************/
 static INT  __tshellFsCmdCmp (INT  iArgC, PCHAR  ppcArgV[])
 {
@@ -739,7 +739,7 @@ static INT  __tshellFsCmdCmp (INT  iArgC, PCHAR  ppcArgV[])
         fprintf(stderr, "parameter error!\n");
         return  (PX_ERROR);
     }
-    if (lib_strcmp(ppcArgV[1], ppcArgV[2]) == 0) {                      /*  ÎÄ¼şÏàÍ¬                    */
+    if (lib_strcmp(ppcArgV[1], ppcArgV[2]) == 0) {                      /*  æ–‡ä»¶ç›¸åŒ                    */
         printf("file same!\n");
         return  (ERROR_NONE);
     }
@@ -756,7 +756,7 @@ static INT  __tshellFsCmdCmp (INT  iArgC, PCHAR  ppcArgV[])
         return  (PX_ERROR);
     }
     
-    iError = fstat(iFdSrc, &statFile);                                  /*  Ê×ÏÈ±È½ÏÎÄ¼ş´óĞ¡            */
+    iError = fstat(iFdSrc, &statFile);                                  /*  é¦–å…ˆæ¯”è¾ƒæ–‡ä»¶å¤§å°            */
     if (iError != ERROR_NONE) {
         fprintf(stderr, "%s get stat error!\n", ppcArgV[1]);
         goto    __error_handle;
@@ -767,16 +767,16 @@ static INT  __tshellFsCmdCmp (INT  iArgC, PCHAR  ppcArgV[])
         fprintf(stderr, "%s get stat error!\n", ppcArgV[2]);
         goto    __error_handle;
     }
-    if (oftSize != statFile.st_size) {                                  /*  ÎÄ¼ş´óĞ¡²»Í¬                */
+    if (oftSize != statFile.st_size) {                                  /*  æ–‡ä»¶å¤§å°ä¸åŒ                */
         printf("file not same!\n");
         goto    __error_handle;
     }
     
-    pcBufferSrc = (PCHAR)__SHEAP_ALLOC((16 * LW_CFG_KB_SIZE));          /*  ¿ª±Ù±È½ÏÄÚ´æ                */
+    pcBufferSrc = (PCHAR)__SHEAP_ALLOC((16 * LW_CFG_KB_SIZE));          /*  å¼€è¾Ÿæ¯”è¾ƒå†…å­˜                */
     pcBufferDst = (PCHAR)__SHEAP_ALLOC((16 * LW_CFG_KB_SIZE));
     if (!pcBufferSrc || !pcBufferDst) {
         if (pcBufferSrc) {
-            __SHEAP_FREE(pcBufferSrc);                                  /*  ±ØĞëÁ½¸öÍ¬Ê±ÉêÇë³É¹¦        */
+            __SHEAP_FREE(pcBufferSrc);                                  /*  å¿…é¡»ä¸¤ä¸ªåŒæ—¶ç”³è¯·æˆåŠŸ        */
         }
         if (pcBufferDst) {
             __SHEAP_FREE(pcBufferDst);
@@ -788,14 +788,14 @@ static INT  __tshellFsCmdCmp (INT  iArgC, PCHAR  ppcArgV[])
         stBuffer    = (16 * LW_CFG_KB_SIZE);
     }
     
-    for (;;) {                                                          /*  ¿ªÊ¼±È½ÏÎÄ¼ş                */
+    for (;;) {                                                          /*  å¼€å§‹æ¯”è¾ƒæ–‡ä»¶                */
         sstRdSrcNum = read(iFdSrc, pcBufferSrc, stBuffer);
         sstRdDstNum = read(iFdDst, pcBufferDst, stBuffer);
         if (sstRdSrcNum != sstRdDstNum) {
             fprintf(stderr, "file read error!\n");
             goto    __error_handle;
         }
-        if (sstRdSrcNum <= 0) {                                         /*  ÎÄ¼ş¶ÁÈ¡Íê±Ï                */
+        if (sstRdSrcNum <= 0) {                                         /*  æ–‡ä»¶è¯»å–å®Œæ¯•                */
             break;
         }
         if (lib_memcmp(pcBufferSrc, pcBufferDst, (UINT)sstRdSrcNum) != 0) {
@@ -804,10 +804,10 @@ static INT  __tshellFsCmdCmp (INT  iArgC, PCHAR  ppcArgV[])
         }
     }
     close(iFdSrc);
-    close(iFdDst);                                                      /*  ¹Ø±ÕÎÄ¼ş                    */
+    close(iFdDst);                                                      /*  å…³é—­æ–‡ä»¶                    */
     if (stBuffer == (16 * LW_CFG_KB_SIZE)) {
         __SHEAP_FREE(pcBufferSrc);
-        __SHEAP_FREE(pcBufferDst);                                      /*  ÊÍ·Å»º³åÇø                  */
+        __SHEAP_FREE(pcBufferDst);                                      /*  é‡Šæ”¾ç¼“å†²åŒº                  */
     }
     printf("file same!\n");
     
@@ -827,14 +827,14 @@ __error_handle:
     return  (PX_ERROR);
 }
 /*********************************************************************************************************
-** º¯ÊıÃû³Æ: __buildDstFileName
-** ¹¦ÄÜÃèÊö: ´´½¨Ä¿±êÎÄ¼şÃû
-** Êä¡¡Èë  : pcSrc         Ô´ÎÄ¼ş
-**           pcDstDir      Ä¿±êÄ¿Â¼
-**           pcBuffer      Êä³ö»º³å
-** Êä¡¡³ö  : NONE
-** È«¾Ö±äÁ¿: 
-** µ÷ÓÃÄ£¿é: 
+** å‡½æ•°åç§°: __buildDstFileName
+** åŠŸèƒ½æè¿°: åˆ›å»ºç›®æ ‡æ–‡ä»¶å
+** è¾“ã€€å…¥  : pcSrc         æºæ–‡ä»¶
+**           pcDstDir      ç›®æ ‡ç›®å½•
+**           pcBuffer      è¾“å‡ºç¼“å†²
+** è¾“ã€€å‡º  : NONE
+** å…¨å±€å˜é‡: 
+** è°ƒç”¨æ¨¡å—: 
 *********************************************************************************************************/
 static VOID __buildDstFileName (CPCHAR  pcSrc, CPCHAR  pcDstDir, PCHAR  pcBuffer)
 {
@@ -857,13 +857,13 @@ static VOID __buildDstFileName (CPCHAR  pcSrc, CPCHAR  pcDstDir, PCHAR  pcBuffer
     lib_strlcat(pcBuffer, pcSrcFileName, MAX_FILENAME_LENGTH);
 }
 /*********************************************************************************************************
-** º¯ÊıÃû³Æ: __tshellFsCmdCp
-** ¹¦ÄÜÃèÊö: ÏµÍ³ÃüÁî "cp"
-** Êä¡¡Èë  : iArgC         ²ÎÊı¸öÊı
-**           ppcArgV       ²ÎÊı±í
-** Êä¡¡³ö  : 0
-** È«¾Ö±äÁ¿: 
-** µ÷ÓÃÄ£¿é: 
+** å‡½æ•°åç§°: __tshellFsCmdCp
+** åŠŸèƒ½æè¿°: ç³»ç»Ÿå‘½ä»¤ "cp"
+** è¾“ã€€å…¥  : iArgC         å‚æ•°ä¸ªæ•°
+**           ppcArgV       å‚æ•°è¡¨
+** è¾“ã€€å‡º  : 0
+** å…¨å±€å˜é‡: 
+** è°ƒç”¨æ¨¡å—: 
 *********************************************************************************************************/
 static INT  __tshellFsCmdCp (INT  iArgC, PCHAR  ppcArgV[])
 {
@@ -902,7 +902,7 @@ static INT  __tshellFsCmdCp (INT  iArgC, PCHAR  ppcArgV[])
             fprintf(stderr, "option error!\n");
             return  (PX_ERROR);
         }
-        if (lib_strchr(ppcArgV[1], 'f')) {                              /*  Ç¿ĞĞ¸´ÖÆ                    */
+        if (lib_strchr(ppcArgV[1], 'f')) {                              /*  å¼ºè¡Œå¤åˆ¶                    */
             bForce = LW_TRUE;
         }
         pcDest = ppcArgV[3];
@@ -913,22 +913,22 @@ static INT  __tshellFsCmdCp (INT  iArgC, PCHAR  ppcArgV[])
         return  (PX_ERROR);
     }
     
-    if (lib_strcmp(pcSrc, pcDest) == 0) {                               /*  ÎÄ¼şÖØ¸´                    */
+    if (lib_strcmp(pcSrc, pcDest) == 0) {                               /*  æ–‡ä»¶é‡å¤                    */
         fprintf(stderr, "parameter error!\n");
         return  (PX_ERROR);
     }
     
-    iFdSrc = open(pcSrc, O_RDONLY, 0);                                  /*  ´ò¿ªÔ´ÎÄ¼ş                  */
+    iFdSrc = open(pcSrc, O_RDONLY, 0);                                  /*  æ‰“å¼€æºæ–‡ä»¶                  */
     if (iFdSrc < 0) {
         fprintf(stderr, "can not open source file!\n");
         return  (PX_ERROR);
     }
     
-    iError = fstat(iFdSrc, &statFile);                                  /*  »ñµÃÔ´ÎÄ¼şÊôĞÔ              */
+    iError = fstat(iFdSrc, &statFile);                                  /*  è·å¾—æºæ–‡ä»¶å±æ€§              */
     if (iError < 0) {
         goto    __error_handle;
     }
-    if (S_ISDIR(statFile.st_mode)) {                                    /*  ²»ÄÜ¸´ÖÆÄ¿Â¼ÎÄ¼ş            */
+    if (S_ISDIR(statFile.st_mode)) {                                    /*  ä¸èƒ½å¤åˆ¶ç›®å½•æ–‡ä»¶            */
         fprintf(stderr, "can not copy directory!\n");
         errno  = EISDIR;
         iError = PX_ERROR;
@@ -938,17 +938,17 @@ static INT  __tshellFsCmdCp (INT  iArgC, PCHAR  ppcArgV[])
     iError = stat(pcDest, &statDst);
     if (iError == ERROR_NONE) {
         if (S_ISDIR(statDst.st_mode)) {
-            __buildDstFileName(pcSrc, pcDest, cDstFile);                /*  Éú³ÉÄ¿±êÎÄ¼şÂ·¾¶            */
+            __buildDstFileName(pcSrc, pcDest, cDstFile);                /*  ç”Ÿæˆç›®æ ‡æ–‡ä»¶è·¯å¾„            */
         }
     }
     if (cDstFile[0] == PX_EOS) {
         lib_strlcpy(cDstFile, pcDest, MAX_FILENAME_LENGTH);
     }
 
-    iError = stat(cDstFile, &statDst);                                  /*  »ñµÃÄ¿±êÎÄ¼şÊôĞÔ            */
-    if (iError == ERROR_NONE) {                                         /*  Ä¿±êÎÄ¼ş´æÔÚ                */
+    iError = stat(cDstFile, &statDst);                                  /*  è·å¾—ç›®æ ‡æ–‡ä»¶å±æ€§            */
+    if (iError == ERROR_NONE) {                                         /*  ç›®æ ‡æ–‡ä»¶å­˜åœ¨                */
         if ((statDst.st_dev == statFile.st_dev) &&
-            (statDst.st_ino == statFile.st_ino)) {                      /*  Ô´ÎÄ¼şÓëÄ¿±êÎÄ¼şÏàÍ¬        */
+            (statDst.st_ino == statFile.st_ino)) {                      /*  æºæ–‡ä»¶ä¸ç›®æ ‡æ–‡ä»¶ç›¸åŒ        */
             close(iFdSrc);
             fprintf(stderr, "'%s' and '%s' are the same file!\n", pcSrc, cDstFile);
             return  (PX_ERROR);
@@ -956,29 +956,29 @@ static INT  __tshellFsCmdCp (INT  iArgC, PCHAR  ppcArgV[])
     }
 
     if (!bForce) {
-        iError = access(cDstFile, 0);                                   /*  ¼ì²âÄ¿±êÎÄ¼şÊÇ·ñ´æÔÚ        */
+        iError = access(cDstFile, 0);                                   /*  æ£€æµ‹ç›®æ ‡æ–‡ä»¶æ˜¯å¦å­˜åœ¨        */
         if (iError == ERROR_NONE) {
 __re_select:
             printf("destination file is exist, overwrite? (Y/N)\n");
             read(0, cTemp, 128);
-            if ((cTemp[0] == 'N') || (cTemp[0] == 'n')) {               /*  ²»¸²¸Ç                      */
+            if ((cTemp[0] == 'N') || (cTemp[0] == 'n')) {               /*  ä¸è¦†ç›–                      */
                 iError = PX_ERROR;
                 goto    __error_handle;
             
-            } else if ((cTemp[0] != 'Y') && (cTemp[0] != 'y')) {        /*  Ñ¡Ôñ´íÎó                    */
+            } else if ((cTemp[0] != 'Y') && (cTemp[0] != 'y')) {        /*  é€‰æ‹©é”™è¯¯                    */
                 goto    __re_select;
             
-            } else {                                                    /*  Ñ¡Ôñ¸²¸Ç                    */
-                unlink(cDstFile);                                       /*  É¾³ıÄ¿±êÎÄ¼ş                */
+            } else {                                                    /*  é€‰æ‹©è¦†ç›–                    */
+                unlink(cDstFile);                                       /*  åˆ é™¤ç›®æ ‡æ–‡ä»¶                */
             }
         }
     } else {
-        iError = access(cDstFile, 0);                                   /*  ¼ì²âÄ¿±êÎÄ¼şÊÇ·ñ´æÔÚ        */
+        iError = access(cDstFile, 0);                                   /*  æ£€æµ‹ç›®æ ‡æ–‡ä»¶æ˜¯å¦å­˜åœ¨        */
         if (iError == ERROR_NONE) {
-            unlink(cDstFile);                                           /*  É¾³ıÄ¿±êÎÄ¼ş                */
+            unlink(cDstFile);                                           /*  åˆ é™¤ç›®æ ‡æ–‡ä»¶                */
         }
     }
-                                                                        /*  ´´½¨Ä¿±êÎÄ¼ş                */
+                                                                        /*  åˆ›å»ºç›®æ ‡æ–‡ä»¶                */
     iFdDst = open(cDstFile, (O_WRONLY | O_CREAT | O_TRUNC), DEFFILEMODE);
     if (iFdDst < 0) {
         close(iFdSrc);
@@ -986,40 +986,40 @@ __re_select:
         return  (PX_ERROR);
     }
     
-    stOptim = (UINT)__MIN(__LW_CP_BUF_SZ, statFile.st_size);            /*  ¼ÆËã»º³åÇø                  */
+    stOptim = (UINT)__MIN(__LW_CP_BUF_SZ, statFile.st_size);            /*  è®¡ç®—ç¼“å†²åŒº                  */
     if (stOptim > 128) {
-        pcBuffer = (PCHAR)__SHEAP_ALLOC(stOptim);                       /*  ·ÖÅä»º³åÇø                  */
+        pcBuffer = (PCHAR)__SHEAP_ALLOC(stOptim);                       /*  åˆ†é…ç¼“å†²åŒº                  */
         if (pcBuffer == LW_NULL) {
-            pcBuffer =  cTemp;                                          /*  Ê¹ÓÃ¾Ö²¿±äÁ¿»º³å            */
+            pcBuffer =  cTemp;                                          /*  ä½¿ç”¨å±€éƒ¨å˜é‡ç¼“å†²            */
         
         } else {
             stBuffer =  stOptim;
         }
     }
     
-    lib_time(&timeStart);                                               /*  ¼ÇÂ¼ÆğÊ¼Ê±¼ä                */
+    lib_time(&timeStart);                                               /*  è®°å½•èµ·å§‹æ—¶é—´                */
     
-    for (;;) {                                                          /*  ¿ªÊ¼¿½±´ÎÄ¼ş                */
+    for (;;) {                                                          /*  å¼€å§‹æ‹·è´æ–‡ä»¶                */
         sstRdNum = read(iFdSrc, pcBuffer, stBuffer);
         if (sstRdNum > 0) {
             sstWrNum = write(iFdDst, pcBuffer, (size_t)sstRdNum);
-            if (sstWrNum != sstRdNum) {                                 /*  Ğ´ÈëÎÄ¼ş´íÎó                */
+            if (sstWrNum != sstRdNum) {                                 /*  å†™å…¥æ–‡ä»¶é”™è¯¯                */
                 fprintf(stderr, "can not write destination file! error: %s\n", lib_strerror(errno));
                 iError = PX_ERROR;
                 break;
             }
-        } else if (sstRdNum == 0) {                                     /*  ¿½±´Íê±Ï                    */
+        } else if (sstRdNum == 0) {                                     /*  æ‹·è´å®Œæ¯•                    */
             iError = ERROR_NONE;
             break;
         
         } else {
-            iError = PX_ERROR;                                          /*  ¶ÁÈ¡Êı¾İ´íÎó                */
+            iError = PX_ERROR;                                          /*  è¯»å–æ•°æ®é”™è¯¯                */
             break;
         }
     }
     
     if (iError == ERROR_NONE) {
-        lib_time(&timeEnd);                                             /*  ¼ÇÂ¼½áÊøÊ±¼ä                */
+        lib_time(&timeEnd);                                             /*  è®°å½•ç»“æŸæ—¶é—´                */
         timeDiff = timeEnd - timeStart;
         
         printf("copy complete. size:%lld(Bytes) time:%lld(s) speed:%lld(Bps)\n", 
@@ -1029,34 +1029,34 @@ __re_select:
     }
         
     if (pcBuffer != cTemp) {
-        __SHEAP_FREE(pcBuffer);                                         /*  ÊÍ·Å»º³å                    */
+        __SHEAP_FREE(pcBuffer);                                         /*  é‡Šæ”¾ç¼“å†²                    */
     }
     
 __error_handle:
     close(iFdSrc);
     if (iFdDst >= 0) {
-        fchmod(iFdDst, statFile.st_mode);                               /*  ÉèÖÃÎªÓëÔ´ÎÄ¼şÏàÍ¬µÄ mode   */
+        fchmod(iFdDst, statFile.st_mode);                               /*  è®¾ç½®ä¸ºä¸æºæ–‡ä»¶ç›¸åŒçš„ mode   */
         close(iFdDst);
     }
     
-    if (iError == ERROR_NONE) {                                         /*  ¿½±´Íê³É                    */
+    if (iError == ERROR_NONE) {                                         /*  æ‹·è´å®Œæˆ                    */
         struct utimbuf  utimbDst;
         
-        utimbDst.actime  = statFile.st_atime;                           /*  ĞŞ¸Ä¸´ÖÆºóÎÄ¼şµÄÊ±¼äĞÅÏ¢    */
+        utimbDst.actime  = statFile.st_atime;                           /*  ä¿®æ”¹å¤åˆ¶åæ–‡ä»¶çš„æ—¶é—´ä¿¡æ¯    */
         utimbDst.modtime = statFile.st_mtime;
         
-        utime(cDstFile, &utimbDst);                                     /*  ÉèÖÃÎÄ¼şÊ±¼ä                */
+        utime(cDstFile, &utimbDst);                                     /*  è®¾ç½®æ–‡ä»¶æ—¶é—´                */
     }
     
     return  (iError);
 }
 /*********************************************************************************************************
-** º¯ÊıÃû³Æ: __tshellFsShowMode
-** ¹¦ÄÜÃèÊö: ÏÔÊ¾ÎÄ¼ş mode Ñ¡Ïî
-** Êä¡¡Èë  : pstat     ÎÄ¼şÑ¡Ïî
-** Êä¡¡³ö  : 0
-** È«¾Ö±äÁ¿: 
-** µ÷ÓÃÄ£¿é: 
+** å‡½æ•°åç§°: __tshellFsShowMode
+** åŠŸèƒ½æè¿°: æ˜¾ç¤ºæ–‡ä»¶ mode é€‰é¡¹
+** è¾“ã€€å…¥  : pstat     æ–‡ä»¶é€‰é¡¹
+** è¾“ã€€å‡º  : 0
+** å…¨å±€å˜é‡: 
+** è°ƒç”¨æ¨¡å—: 
 *********************************************************************************************************/
 static VOID __tshellFsShowMode (struct stat  *pstat)
 {
@@ -1158,14 +1158,14 @@ static VOID __tshellFsShowMode (struct stat  *pstat)
     printf(cBuffer);
 }
 /*********************************************************************************************************
-** º¯ÊıÃû³Æ: __tshellFsShowFile
-** ¹¦ÄÜÃèÊö: ÏÔÊ¾ÎÄ¼şÏêÏ¸ĞÅÏ¢
-** Êä¡¡Èë  : pcFileName ÎÄ¼şÃû
-**           pcStat     ÎÄ¼şÃû
-**           pstat      ÎÄ¼şÑ¡Ïî
-** Êä¡¡³ö  : 0
-** È«¾Ö±äÁ¿: 
-** µ÷ÓÃÄ£¿é: 
+** å‡½æ•°åç§°: __tshellFsShowFile
+** åŠŸèƒ½æè¿°: æ˜¾ç¤ºæ–‡ä»¶è¯¦ç»†ä¿¡æ¯
+** è¾“ã€€å…¥  : pcFileName æ–‡ä»¶å
+**           pcStat     æ–‡ä»¶å
+**           pstat      æ–‡ä»¶é€‰é¡¹
+** è¾“ã€€å‡º  : 0
+** å…¨å±€å˜é‡: 
+** è°ƒç”¨æ¨¡å—: 
 *********************************************************************************************************/
 static VOID __tshellFsShowFile (CPCHAR  pcFileName, PCHAR  pcStat, struct stat  *pstat)
 {
@@ -1174,37 +1174,37 @@ static VOID __tshellFsShowFile (CPCHAR  pcFileName, PCHAR  pcStat, struct stat  
     CHAR            cTimeBuf[32];                                       /*  bigger than sizeof(ASCBUF)  */
     CHAR            cBuffer[MAX_FILENAME_LENGTH];
     
-    __tshellFsShowMode(pstat);                                          /*  ÏÔÊ¾ÎÄ¼şÊôĞÔ                */
+    __tshellFsShowMode(pstat);                                          /*  æ˜¾ç¤ºæ–‡ä»¶å±æ€§                */
             
     if (API_TShellGetUserName(pstat->st_uid,
-                              cBuffer, sizeof(cBuffer))) {              /*  »ñµÃÎÄ¼şËùÊôÓÃ»§Ãû          */
+                              cBuffer, sizeof(cBuffer))) {              /*  è·å¾—æ–‡ä»¶æ‰€å±ç”¨æˆ·å          */
         printf(" %-8d", pstat->st_uid);
     } else {
         printf(" %-8s", cBuffer);
     }
     
     if (API_TShellGetGrpName(pstat->st_gid,
-                             cBuffer, sizeof(cBuffer))) {               /*  »ñµÃÎÄ¼şËùÊôÓÃ»§Ãû          */
+                             cBuffer, sizeof(cBuffer))) {               /*  è·å¾—æ–‡ä»¶æ‰€å±ç”¨æˆ·å          */
         printf(" %-8d", pstat->st_gid);
     } else {
         printf(" %-8s", cBuffer);
     }
     
-    lib_localtime_r(&pstat->st_mtime, &tmBuf);                          /*  ×ª»»Îª tm ¸ñÊ½              */
-    lib_asctime_r(&tmBuf, cTimeBuf);                                    /*  Éú³É×Ö·û´®                  */
+    lib_localtime_r(&pstat->st_mtime, &tmBuf);                          /*  è½¬æ¢ä¸º tm æ ¼å¼              */
+    lib_asctime_r(&tmBuf, cTimeBuf);                                    /*  ç”Ÿæˆå­—ç¬¦ä¸²                  */
     pcN = lib_index(cTimeBuf, '\n');
     if (pcN) {
         *pcN = PX_EOS;
     }
     
-    printf(" %s", cTimeBuf);                                            /*  ´òÓ¡ĞŞ¸ÄÊ±¼ä                */
+    printf(" %s", cTimeBuf);                                            /*  æ‰“å°ä¿®æ”¹æ—¶é—´                */
     
     if (S_ISDIR(pstat->st_mode)) {
         API_TShellColorStart(pcFileName, "", pstat->st_mode, STD_OUT);
         printf("           %s/\n", pcFileName);
         API_TShellColorEnd(STD_OUT);
                               
-    } else if (S_ISLNK(pstat->st_mode)) {                               /*  Á´½ÓÎÄ¼ş                    */
+    } else if (S_ISLNK(pstat->st_mode)) {                               /*  é“¾æ¥æ–‡ä»¶                    */
         CHAR            cDstName[MAX_FILENAME_LENGTH] = "<unknown>";
         struct stat     statDst;
         ssize_t         sstLen;
@@ -1212,7 +1212,7 @@ static VOID __tshellFsShowFile (CPCHAR  pcFileName, PCHAR  pcStat, struct stat  
         statDst.st_mode = 0;
         sstLen = readlink(pcStat, cDstName, MAX_FILENAME_LENGTH);
         if (sstLen >= 0) {
-            cDstName[sstLen] = PX_EOS;                                  /*  ¼ÓÈë½áÊø·û                  */
+            cDstName[sstLen] = PX_EOS;                                  /*  åŠ å…¥ç»“æŸç¬¦                  */
         }
         stat(cDstName, &statDst);
         API_TShellColorStart(pcFileName, cDstName, pstat->st_mode, STD_OUT);
@@ -1238,13 +1238,13 @@ static VOID __tshellFsShowFile (CPCHAR  pcFileName, PCHAR  pcStat, struct stat  
     }
 }
 /*********************************************************************************************************
-** º¯ÊıÃû³Æ: __tshellFsCmdLl
-** ¹¦ÄÜÃèÊö: ÏµÍ³ÃüÁî "ll"
-** Êä¡¡Èë  : iArgC         ²ÎÊı¸öÊı
-**           ppcArgV       ²ÎÊı±í
-** Êä¡¡³ö  : 0
-** È«¾Ö±äÁ¿: 
-** µ÷ÓÃÄ£¿é: 
+** å‡½æ•°åç§°: __tshellFsCmdLl
+** åŠŸèƒ½æè¿°: ç³»ç»Ÿå‘½ä»¤ "ll"
+** è¾“ã€€å…¥  : iArgC         å‚æ•°ä¸ªæ•°
+**           ppcArgV       å‚æ•°è¡¨
+** è¾“ã€€å‡º  : 0
+** å…¨å±€å˜é‡: 
+** è°ƒç”¨æ¨¡å—: 
 *********************************************************************************************************/
 static INT  __tshellFsCmdLl (INT  iArgC, PCHAR  ppcArgV[])
 {
@@ -1259,10 +1259,10 @@ static INT  __tshellFsCmdLl (INT  iArgC, PCHAR  ppcArgV[])
              INT             iError;
              INT             iItemNum = 0;
     
-    if ((iArgC == 2) && lib_strcmp(ppcArgV[1], ".")) {                  /*  Ö¸¶¨Ä¿Â¼                    */
+    if ((iArgC == 2) && lib_strcmp(ppcArgV[1], ".")) {                  /*  æŒ‡å®šç›®å½•                    */
         lib_strcpy(cDirName, ppcArgV[1]);
         if (stat(cDirName, &statGet) == ERROR_NONE) {
-            if (!S_ISDIR(statGet.st_mode)) {                            /*  ²»ÊÇÄ¿Â¼                    */
+            if (!S_ISDIR(statGet.st_mode)) {                            /*  ä¸æ˜¯ç›®å½•                    */
                 PCHAR   pcFile;
                 _PathLastName(cDirName, &pcFile);
                 __tshellFsShowFile(pcFile, pcFile, &statGet);
@@ -1274,12 +1274,12 @@ static INT  __tshellFsCmdLl (INT  iArgC, PCHAR  ppcArgV[])
         stDirLen = lib_strlen(cDirName);
         pdir     = opendir(cDirName);
         if (stDirLen > 0) {
-            if (cDirName[stDirLen - 1] != PX_DIVIDER) {                 /*  ²ÎÊıÄ¿Â¼²»ÊÇÒÔ / ½áÎ²       */
-                cDirName[stDirLen++] = PX_DIVIDER;                      /*  Ìí¼ÓÒ»¸ö /                  */
+            if (cDirName[stDirLen - 1] != PX_DIVIDER) {                 /*  å‚æ•°ç›®å½•ä¸æ˜¯ä»¥ / ç»“å°¾       */
+                cDirName[stDirLen++] = PX_DIVIDER;                      /*  æ·»åŠ ä¸€ä¸ª /                  */
             }
         }
     } else {
-        pdir = opendir(cDirName);                                       /*  µ±Ç°Ä¿Â¼                    */
+        pdir = opendir(cDirName);                                       /*  å½“å‰ç›®å½•                    */
     }
     
     if (!pdir) {
@@ -1299,18 +1299,18 @@ static INT  __tshellFsCmdLl (INT  iArgC, PCHAR  ppcArgV[])
         } else {
             if ((stDirLen > 1) || 
                 ((stDirLen == 1) && (cDirName[0] == PX_ROOT))) {
-                lib_strcpy(&cDirName[stDirLen], pdirent->d_name);       /*  Á´½ÓÖ¸¶¨Ä¿Â¼                */
+                lib_strcpy(&cDirName[stDirLen], pdirent->d_name);       /*  é“¾æ¥æŒ‡å®šç›®å½•                */
                 pcStat = cDirName;
                 iError = lstat(cDirName, &statGet);
             
             } else {
                 pcStat = pdirent->d_name;
-                iError = lstat(pdirent->d_name, &statGet);              /*  Ê¹ÓÃµ±Ç°Ä¿Â¼                */
+                iError = lstat(pdirent->d_name, &statGet);              /*  ä½¿ç”¨å½“å‰ç›®å½•                */
             }
-            if (iError < 0) {                                           /*  Éè±¸ÎÄ¼şÄ¬ÈÏÊ¹ÓÃÏÂÃæµÄÊôĞÔ  */
+            if (iError < 0) {                                           /*  è®¾å¤‡æ–‡ä»¶é»˜è®¤ä½¿ç”¨ä¸‹é¢çš„å±æ€§  */
                 statGet.st_dev     = 0;
                 statGet.st_ino     = 0;
-                statGet.st_mode    = 0666 | S_IFCHR;                    /*  Ä¬ÈÏÊôĞÔ                    */
+                statGet.st_mode    = 0666 | S_IFCHR;                    /*  é»˜è®¤å±æ€§                    */
                 statGet.st_nlink   = 0;
                 statGet.st_uid     = 0;
                 statGet.st_gid     = 0;
@@ -1318,7 +1318,7 @@ static INT  __tshellFsCmdLl (INT  iArgC, PCHAR  ppcArgV[])
                 statGet.st_size    = 0;
                 statGet.st_blksize = 0;
                 statGet.st_blocks  = 0;
-                statGet.st_atime   = API_RootFsTime(LW_NULL);           /*  Ä¬ÈÏÊ¹ÓÃ root fs »ù×¼Ê±¼ä   */
+                statGet.st_atime   = API_RootFsTime(LW_NULL);           /*  é»˜è®¤ä½¿ç”¨ root fs åŸºå‡†æ—¶é—´   */
                 statGet.st_mtime   = API_RootFsTime(LW_NULL);
                 statGet.st_ctime   = API_RootFsTime(LW_NULL);
             }
@@ -1337,15 +1337,15 @@ __display_over:
     return  (ERROR_NONE);
 }
 /*********************************************************************************************************
-** º¯ÊıÃû³Æ: __getDsize
-** ¹¦ÄÜÃèÊö: µİ¹é»ñÈ¡ÎÄ¼ş¼ĞµÄÎÄ¼şÊıÁ¿ºÍ´óĞ¡
-** Êä¡¡Èë  : pcDirName     Ä¿Â¼Ãû
-**           stDirLen      µ±Ç°Ä¿Â¼Ãû³¤¶È
-**           pulFileCnt    ÎÄ¼şÊıÁ¿
-**           poftSize      ×Ü´óĞ¡
-** Êä¡¡³ö  : NONE
-** È«¾Ö±äÁ¿: 
-** µ÷ÓÃÄ£¿é: 
+** å‡½æ•°åç§°: __getDsize
+** åŠŸèƒ½æè¿°: é€’å½’è·å–æ–‡ä»¶å¤¹çš„æ–‡ä»¶æ•°é‡å’Œå¤§å°
+** è¾“ã€€å…¥  : pcDirName     ç›®å½•å
+**           stDirLen      å½“å‰ç›®å½•åé•¿åº¦
+**           pulFileCnt    æ–‡ä»¶æ•°é‡
+**           poftSize      æ€»å¤§å°
+** è¾“ã€€å‡º  : NONE
+** å…¨å±€å˜é‡: 
+** è°ƒç”¨æ¨¡å—: 
 *********************************************************************************************************/
 static VOID  __getDsize (PCHAR  pcDirName, size_t  stDirLen, ULONG  *pulFileCnt, off_t  *poftSize)
 {
@@ -1375,13 +1375,13 @@ static VOID  __getDsize (PCHAR  pcDirName, size_t  stDirLen, ULONG  *pulFileCnt,
     }
 }
 /*********************************************************************************************************
-** º¯ÊıÃû³Æ: __tshellFsCmdDsize
-** ¹¦ÄÜÃèÊö: ÏµÍ³ÃüÁî "dsize"
-** Êä¡¡Èë  : iArgC         ²ÎÊı¸öÊı
-**           ppcArgV       ²ÎÊı±í
-** Êä¡¡³ö  : ERROR
-** È«¾Ö±äÁ¿: 
-** µ÷ÓÃÄ£¿é: 
+** å‡½æ•°åç§°: __tshellFsCmdDsize
+** åŠŸèƒ½æè¿°: ç³»ç»Ÿå‘½ä»¤ "dsize"
+** è¾“ã€€å…¥  : iArgC         å‚æ•°ä¸ªæ•°
+**           ppcArgV       å‚æ•°è¡¨
+** è¾“ã€€å‡º  : ERROR
+** å…¨å±€å˜é‡: 
+** è°ƒç”¨æ¨¡å—: 
 *********************************************************************************************************/
 static INT  __tshellFsCmdDsize (INT  iArgC, PCHAR  ppcArgV[])
 {
@@ -1413,13 +1413,13 @@ static INT  __tshellFsCmdDsize (INT  iArgC, PCHAR  ppcArgV[])
     return  (ERROR_NONE);
 }
 /*********************************************************************************************************
-** º¯ÊıÃû³Æ: __tshellFsCmdDf
-** ¹¦ÄÜÃèÊö: ÏµÍ³ÃüÁî "df"
-** Êä¡¡Èë  : iArgC         ²ÎÊı¸öÊı
-**           ppcArgV       ²ÎÊı±í
-** Êä¡¡³ö  : 0
-** È«¾Ö±äÁ¿: 
-** µ÷ÓÃÄ£¿é: 
+** å‡½æ•°åç§°: __tshellFsCmdDf
+** åŠŸèƒ½æè¿°: ç³»ç»Ÿå‘½ä»¤ "df"
+** è¾“ã€€å…¥  : iArgC         å‚æ•°ä¸ªæ•°
+**           ppcArgV       å‚æ•°è¡¨
+** è¾“ã€€å‡º  : 0
+** å…¨å±€å˜é‡: 
+** è°ƒç”¨æ¨¡å—: 
 *********************************************************************************************************/
 static INT  __tshellFsCmdDf (INT  iArgC, PCHAR  ppcArgV[])
 {
@@ -1430,13 +1430,13 @@ static INT  __tshellFsCmdDf (INT  iArgC, PCHAR  ppcArgV[])
     struct statfs       statfsGet;
            
            /*
-            *  ´ÅÅÌĞÅÏ¢
+            *  ç£ç›˜ä¿¡æ¯
             */
            UINT64       ullFree;
            UINT64       ullTotal;
            
            /*
-            *  ÏÔÊ¾ÓÃ±äÁ¿
+            *  æ˜¾ç¤ºç”¨å˜é‡
             */
            ULONG        ulTotalDisp;
            ULONG        ulTotalPoint;
@@ -1444,29 +1444,29 @@ static INT  __tshellFsCmdDf (INT  iArgC, PCHAR  ppcArgV[])
            ULONG        ulFreePoint;
            
            /*
-            *  ÏÔÊ¾µ¥Î»µÄ±ÈÖµ
+            *  æ˜¾ç¤ºå•ä½çš„æ¯”å€¼
             */
            ULONG        ulTotalDiv;
            ULONG        ulFreeDiv;
            
            /*
-            *  ÏÔÊ¾µ¥Î»
+            *  æ˜¾ç¤ºå•ä½
             */
            PCHAR        pcTotalUnit = "";
            PCHAR        pcFreeUnit  = "";
            
            /*
-            *  ÎÄ¼şÏµÍ³ÀàĞÍ
+            *  æ–‡ä»¶ç³»ç»Ÿç±»å‹
             */
            PCHAR        pcFsType = "unknown";
            
            /*
-            *  Ê¹ÓÃ°Ù·Ö±È
+            *  ä½¿ç”¨ç™¾åˆ†æ¯”
             */
            INT          iUseagePercent;
            
            /*
-            *  ÊÇ·ñÎªÖ»¶Á
+            *  æ˜¯å¦ä¸ºåªè¯»
             */
            PCHAR        pcRo = "n";
 
@@ -1575,13 +1575,13 @@ static INT  __tshellFsCmdDf (INT  iArgC, PCHAR  ppcArgV[])
     return  (0);
 }
 /*********************************************************************************************************
-** º¯ÊıÃû³Æ: __tshellFsCmdChmod
-** ¹¦ÄÜÃèÊö: ÏµÍ³ÃüÁî "chmod"
-** Êä¡¡Èë  : iArgC         ²ÎÊı¸öÊı
-**           ppcArgV       ²ÎÊı±í
-** Êä¡¡³ö  : 0
-** È«¾Ö±äÁ¿: 
-** µ÷ÓÃÄ£¿é: 
+** å‡½æ•°åç§°: __tshellFsCmdChmod
+** åŠŸèƒ½æè¿°: ç³»ç»Ÿå‘½ä»¤ "chmod"
+** è¾“ã€€å…¥  : iArgC         å‚æ•°ä¸ªæ•°
+**           ppcArgV       å‚æ•°è¡¨
+** è¾“ã€€å‡º  : 0
+** å…¨å±€å˜é‡: 
+** è°ƒç”¨æ¨¡å—: 
 *********************************************************************************************************/
 static INT  __tshellFsCmdChmod (INT  iArgC, PCHAR  ppcArgV[])
 {
@@ -1600,7 +1600,7 @@ static INT  __tshellFsCmdChmod (INT  iArgC, PCHAR  ppcArgV[])
         return  (PX_ERROR);
     }
     
-    for (i = 0; i < stLen; i++) {                                       /*  ±ØĞëÊÇ 8½øÖÆµÄ              */
+    for (i = 0; i < stLen; i++) {                                       /*  å¿…é¡»æ˜¯ 8è¿›åˆ¶çš„              */
         if ((ppcArgV[1][i] > '7') || (ppcArgV[1][i] < '0')) {
             fprintf(stderr, "newmode error, (eg. 777 ... octal)\n");
             return  (PX_ERROR);
@@ -1610,7 +1610,7 @@ static INT  __tshellFsCmdChmod (INT  iArgC, PCHAR  ppcArgV[])
     sscanf(ppcArgV[1], "%o", &iNewMode);
     
     if (lib_strchr(ppcArgV[2], '*') ||
-        lib_strchr(ppcArgV[2], '?')) {                                  /*  °üº¬ shell Í¨Åä·û           */
+        lib_strchr(ppcArgV[2], '?')) {                                  /*  åŒ…å« shell é€šé…ç¬¦           */
 
 #if LW_CFG_POSIX_EN > 0
         DIR             *pdir;
@@ -1625,12 +1625,12 @@ static INT  __tshellFsCmdChmod (INT  iArgC, PCHAR  ppcArgV[])
             stDirLen = pcTail - ppcArgV[2];
             lib_memcpy(cName, ppcArgV[2], stDirLen);
             cName[stDirLen] = PX_EOS;
-            pcTail++;                                                   /*  Ö¸ÏòÎÄ¼şÃû²¿·Ö              */
+            pcTail++;                                                   /*  æŒ‡å‘æ–‡ä»¶åéƒ¨åˆ†              */
         
         } else {
             stDirLen = 1;
-            lib_strcpy(cName, ".");                                     /*  µ±Ç°Ä¿Â¼                    */
-            pcTail = ppcArgV[2];                                        /*  Ö¸ÏòÎÄ¼şÃû²¿·Ö              */
+            lib_strcpy(cName, ".");                                     /*  å½“å‰ç›®å½•                    */
+            pcTail = ppcArgV[2];                                        /*  æŒ‡å‘æ–‡ä»¶åéƒ¨åˆ†              */
         }
         
         pdir = opendir(cName);
@@ -1644,7 +1644,7 @@ static INT  __tshellFsCmdChmod (INT  iArgC, PCHAR  ppcArgV[])
             iRet = fnmatch(pcTail, pdirent->d_name, FNM_PATHNAME);
             if (iRet == ERROR_NONE) {
                 bnprintf(cName, MAX_FILENAME_LENGTH, stDirLen, "/%s", pdirent->d_name);
-                i = chmod(cName, iNewMode);                             /*  ×ª»»ÎÄ¼şÄ£Ê½                */
+                i = chmod(cName, iNewMode);                             /*  è½¬æ¢æ–‡ä»¶æ¨¡å¼                */
                 if (i < 0) {
                     if (errno == EACCES) {
                         fprintf(stderr, "%s insufficient permissions.\n", 
@@ -1663,7 +1663,7 @@ static INT  __tshellFsCmdChmod (INT  iArgC, PCHAR  ppcArgV[])
         return  (PX_ERROR);
 #endif
     } else {
-        i = chmod(ppcArgV[2], iNewMode);                                /*  ×ª»»ÎÄ¼şÄ£Ê½                */
+        i = chmod(ppcArgV[2], iNewMode);                                /*  è½¬æ¢æ–‡ä»¶æ¨¡å¼                */
         if (i < 0) {
             if (errno == EACCES) {
                 fprintf(stderr, "insufficient permissions.\n");
@@ -1677,13 +1677,13 @@ static INT  __tshellFsCmdChmod (INT  iArgC, PCHAR  ppcArgV[])
     return  (ERROR_NONE);
 }
 /*********************************************************************************************************
-** º¯ÊıÃû³Æ: __tshellFsCmdMkfs
-** ¹¦ÄÜÃèÊö: ÏµÍ³ÃüÁî "mkfs"
-** Êä¡¡Èë  : iArgC         ²ÎÊı¸öÊı
-**           ppcArgV       ²ÎÊı±í
-** Êä¡¡³ö  : 0
-** È«¾Ö±äÁ¿: 
-** µ÷ÓÃÄ£¿é: 
+** å‡½æ•°åç§°: __tshellFsCmdMkfs
+** åŠŸèƒ½æè¿°: ç³»ç»Ÿå‘½ä»¤ "mkfs"
+** è¾“ã€€å…¥  : iArgC         å‚æ•°ä¸ªæ•°
+**           ppcArgV       å‚æ•°è¡¨
+** è¾“ã€€å‡º  : 0
+** å…¨å±€å˜é‡: 
+** è°ƒç”¨æ¨¡å—: 
 *********************************************************************************************************/
 static INT  __tshellFsCmdMkfs (INT  iArgC, PCHAR  ppcArgV[])
 {
@@ -1709,26 +1709,26 @@ static INT  __tshellFsCmdMkfs (INT  iArgC, PCHAR  ppcArgV[])
     return  (ERROR_NONE);
 }
 /*********************************************************************************************************
-** º¯ÊıÃû³Æ: __tshellFsCmdShfile
-** ¹¦ÄÜÃèÊö: ÏµÍ³ÃüÁî "shfile"
-** Êä¡¡Èë  : iArgC         ²ÎÊı¸öÊı
-**           ppcArgV       ²ÎÊı±í
-** Êä¡¡³ö  : 0
-** È«¾Ö±äÁ¿: 
-** µ÷ÓÃÄ£¿é: 
+** å‡½æ•°åç§°: __tshellFsCmdShfile
+** åŠŸèƒ½æè¿°: ç³»ç»Ÿå‘½ä»¤ "shfile"
+** è¾“ã€€å…¥  : iArgC         å‚æ•°ä¸ªæ•°
+**           ppcArgV       å‚æ•°è¡¨
+** è¾“ã€€å‡º  : 0
+** å…¨å±€å˜é‡: 
+** è°ƒç”¨æ¨¡å—: 
 *********************************************************************************************************/
 static INT  __tshellFsCmdShfile (INT  iArgC, PCHAR  ppcArgV[])
 {
     FILE  *fileShell;
     PCHAR  pcCmd       = LW_NULL;
-    PCHAR  pcCmdBuffer = LW_NULL;                                       /*  ÃüÁî»º³å                    */
+    PCHAR  pcCmdBuffer = LW_NULL;                                       /*  å‘½ä»¤ç¼“å†²                    */
     
     if (iArgC != 2) {
         fprintf(stderr, "arguments error!\n");
         return  (-ERROR_TSHELL_EPARAM);
     }
     
-    fileShell = fopen(ppcArgV[1], "r");                                 /*  ´ò¿ª shell ÎÄ¼ş             */
+    fileShell = fopen(ppcArgV[1], "r");                                 /*  æ‰“å¼€ shell æ–‡ä»¶             */
     if (fileShell == LW_NULL) {
         if (errno == EACCES) {
             fprintf(stderr, "insufficient permissions.\n");
@@ -1738,7 +1738,7 @@ static INT  __tshellFsCmdShfile (INT  iArgC, PCHAR  ppcArgV[])
         return  (-ERROR_TSHELL_EPARAM);
     }
     
-    pcCmdBuffer = (PCHAR)__SHEAP_ALLOC(LW_CFG_SHELL_MAX_COMMANDLEN + 1);/*  ¿ª±ÙÃüÁî»º³å                */
+    pcCmdBuffer = (PCHAR)__SHEAP_ALLOC(LW_CFG_SHELL_MAX_COMMANDLEN + 1);/*  å¼€è¾Ÿå‘½ä»¤ç¼“å†²                */
     if (pcCmdBuffer == LW_NULL) {
         fclose(fileShell);
         fprintf(stderr, "system low memory.\n");
@@ -1747,25 +1747,25 @@ static INT  __tshellFsCmdShfile (INT  iArgC, PCHAR  ppcArgV[])
     
     do {
         pcCmd = fgets(pcCmdBuffer, LW_CFG_SHELL_MAX_COMMANDLEN, 
-                      fileShell);                                       /*  »ñµÃÒ»ÌõÖ¸Áî                */
+                      fileShell);                                       /*  è·å¾—ä¸€æ¡æŒ‡ä»¤                */
         if (pcCmd) {
-            API_TShellExec(pcCmd);                                      /*  Ö´ĞĞÖ¸¶¨ÃüÁî                */
+            API_TShellExec(pcCmd);                                      /*  æ‰§è¡ŒæŒ‡å®šå‘½ä»¤                */
         }
     } while (pcCmd);
     
-    __SHEAP_FREE(pcCmdBuffer);                                          /*  ÊÍ·Å»º´æ                    */
+    __SHEAP_FREE(pcCmdBuffer);                                          /*  é‡Šæ”¾ç¼“å­˜                    */
     fclose(fileShell);
     
     return  (ERROR_NONE);
 }
 /*********************************************************************************************************
-** º¯ÊıÃû³Æ: __tshellFsCmdMount
-** ¹¦ÄÜÃèÊö: ÏµÍ³ÃüÁî "mount"
-** Êä¡¡Èë  : iArgC         ²ÎÊı¸öÊı
-**           ppcArgV       ²ÎÊı±í
-** Êä¡¡³ö  : 0
-** È«¾Ö±äÁ¿: 
-** µ÷ÓÃÄ£¿é: 
+** å‡½æ•°åç§°: __tshellFsCmdMount
+** åŠŸèƒ½æè¿°: ç³»ç»Ÿå‘½ä»¤ "mount"
+** è¾“ã€€å…¥  : iArgC         å‚æ•°ä¸ªæ•°
+**           ppcArgV       å‚æ•°è¡¨
+** è¾“ã€€å‡º  : 0
+** å…¨å±€å˜é‡: 
+** è°ƒç”¨æ¨¡å—: 
 *********************************************************************************************************/
 #if LW_CFG_MOUNT_EN > 0
 
@@ -1817,13 +1817,13 @@ static INT  __tshellFsCmdMount (INT  iArgC, PCHAR  ppcArgV[])
     }
 }
 /*********************************************************************************************************
-** º¯ÊıÃû³Æ: __tshellFsCmdUmount
-** ¹¦ÄÜÃèÊö: ÏµÍ³ÃüÁî "umount"
-** Êä¡¡Èë  : iArgC         ²ÎÊı¸öÊı
-**           ppcArgV       ²ÎÊı±í
-** Êä¡¡³ö  : 0
-** È«¾Ö±äÁ¿: 
-** µ÷ÓÃÄ£¿é: 
+** å‡½æ•°åç§°: __tshellFsCmdUmount
+** åŠŸèƒ½æè¿°: ç³»ç»Ÿå‘½ä»¤ "umount"
+** è¾“ã€€å…¥  : iArgC         å‚æ•°ä¸ªæ•°
+**           ppcArgV       å‚æ•°è¡¨
+** è¾“ã€€å‡º  : 0
+** å…¨å±€å˜é‡: 
+** è°ƒç”¨æ¨¡å—: 
 *********************************************************************************************************/
 static INT  __tshellFsCmdUmount (INT  iArgC, PCHAR  ppcArgV[])
 {
@@ -1839,13 +1839,13 @@ static INT  __tshellFsCmdUmount (INT  iArgC, PCHAR  ppcArgV[])
     }
 }
 /*********************************************************************************************************
-** º¯ÊıÃû³Æ: __tshellFsCmdRemount
-** ¹¦ÄÜÃèÊö: ÏµÍ³ÃüÁî "remount"
-** Êä¡¡Èë  : iArgC         ²ÎÊı¸öÊı
-**           ppcArgV       ²ÎÊı±í
-** Êä¡¡³ö  : 0
-** È«¾Ö±äÁ¿: 
-** µ÷ÓÃÄ£¿é: 
+** å‡½æ•°åç§°: __tshellFsCmdRemount
+** åŠŸèƒ½æè¿°: ç³»ç»Ÿå‘½ä»¤ "remount"
+** è¾“ã€€å…¥  : iArgC         å‚æ•°ä¸ªæ•°
+**           ppcArgV       å‚æ•°è¡¨
+** è¾“ã€€å‡º  : 0
+** å…¨å±€å˜é‡: 
+** è°ƒç”¨æ¨¡å—: 
 *********************************************************************************************************/
 #if LW_CFG_OEMDISK_EN > 0
 
@@ -1882,13 +1882,13 @@ static INT  __tshellFsCmdRemount (INT  iArgC, PCHAR  ppcArgV[])
 
 #endif                                                                  /*  LW_CFG_OEMDISK_EN > 0       */
 /*********************************************************************************************************
-** º¯ÊıÃû³Æ: __tshellFsCmdShowmount
-** ¹¦ÄÜÃèÊö: ÏµÍ³ÃüÁî "showmount"
-** Êä¡¡Èë  : iArgC         ²ÎÊı¸öÊı
-**           ppcArgV       ²ÎÊı±í
-** Êä¡¡³ö  : 0
-** È«¾Ö±äÁ¿: 
-** µ÷ÓÃÄ£¿é: 
+** å‡½æ•°åç§°: __tshellFsCmdShowmount
+** åŠŸèƒ½æè¿°: ç³»ç»Ÿå‘½ä»¤ "showmount"
+** è¾“ã€€å…¥  : iArgC         å‚æ•°ä¸ªæ•°
+**           ppcArgV       å‚æ•°è¡¨
+** è¾“ã€€å‡º  : 0
+** å…¨å±€å˜é‡: 
+** è°ƒç”¨æ¨¡å—: 
 *********************************************************************************************************/
 static INT  __tshellFsCmdShowmount (INT  iArgC, PCHAR  ppcArgV[])
 {
@@ -1909,13 +1909,13 @@ static INT  __tshellFsCmdShowmount (INT  iArgC, PCHAR  ppcArgV[])
 
 #endif                                                                  /*  LW_CFG_MOUNT_EN > 0         */
 /*********************************************************************************************************
-** º¯ÊıÃû³Æ: __tshellFsCmdLn
-** ¹¦ÄÜÃèÊö: ÏµÍ³ÃüÁî "ln"
-** Êä¡¡Èë  : iArgC         ²ÎÊı¸öÊı
-**           ppcArgV       ²ÎÊı±í
-** Êä¡¡³ö  : 0
-** È«¾Ö±äÁ¿: 
-** µ÷ÓÃÄ£¿é: 
+** å‡½æ•°åç§°: __tshellFsCmdLn
+** åŠŸèƒ½æè¿°: ç³»ç»Ÿå‘½ä»¤ "ln"
+** è¾“ã€€å…¥  : iArgC         å‚æ•°ä¸ªæ•°
+**           ppcArgV       å‚æ•°è¡¨
+** è¾“ã€€å‡º  : 0
+** å…¨å±€å˜é‡: 
+** è°ƒç”¨æ¨¡å—: 
 *********************************************************************************************************/
 static INT  __tshellFsCmdLn (INT  iArgC, PCHAR  ppcArgV[])
 {
@@ -1957,13 +1957,13 @@ static INT  __tshellFsCmdLn (INT  iArgC, PCHAR  ppcArgV[])
     return  (ERROR_NONE);
 }
 /*********************************************************************************************************
-** º¯ÊıÃû³Æ: __tshellFsCmdDosfslabel
-** ¹¦ÄÜÃèÊö: ÏµÍ³ÃüÁî "dosfslabel"
-** Êä¡¡Èë  : iArgC         ²ÎÊı¸öÊı
-**           ppcArgV       ²ÎÊı±í
-** Êä¡¡³ö  : 0
-** È«¾Ö±äÁ¿: 
-** µ÷ÓÃÄ£¿é: 
+** å‡½æ•°åç§°: __tshellFsCmdDosfslabel
+** åŠŸèƒ½æè¿°: ç³»ç»Ÿå‘½ä»¤ "dosfslabel"
+** è¾“ã€€å…¥  : iArgC         å‚æ•°ä¸ªæ•°
+**           ppcArgV       å‚æ•°è¡¨
+** è¾“ã€€å‡º  : 0
+** å…¨å±€å˜é‡: 
+** è°ƒç”¨æ¨¡å—: 
 *********************************************************************************************************/
 #if LW_CFG_FATFS_EN > 0
 
@@ -1978,10 +1978,10 @@ static INT  __tshellFsCmdDosfslabel (INT  iArgC, PCHAR  ppcArgV[])
         return  (-ERROR_TSHELL_EPARAM);
     }
 
-    if (iArgC == 2) {                                                   /*  »ñÈ¡¾í±ê                    */
+    if (iArgC == 2) {                                                   /*  è·å–å·æ ‡                    */
         iFd = open(ppcArgV[1], O_RDONLY);
     } else {
-        iFd = open(ppcArgV[1], O_RDWR);                                 /*  ÉèÖÃ¾í±ê                    */
+        iFd = open(ppcArgV[1], O_RDWR);                                 /*  è®¾ç½®å·æ ‡                    */
     }
     
     if (iFd < 0) {
@@ -2010,13 +2010,13 @@ static INT  __tshellFsCmdDosfslabel (INT  iArgC, PCHAR  ppcArgV[])
 
 #endif                                                                  /*  LW_CFG_FATFS_EN > 0         */
 /*********************************************************************************************************
-** º¯ÊıÃû³Æ: __tshellFsCmdFdisk
-** ¹¦ÄÜÃèÊö: ÏµÍ³ÃüÁî "fdisk"
-** Êä¡¡Èë  : iArgC         ²ÎÊı¸öÊı
-**           ppcArgV       ²ÎÊı±í
-** Êä¡¡³ö  : 0
-** È«¾Ö±äÁ¿:
-** µ÷ÓÃÄ£¿é:
+** å‡½æ•°åç§°: __tshellFsCmdFdisk
+** åŠŸèƒ½æè¿°: ç³»ç»Ÿå‘½ä»¤ "fdisk"
+** è¾“ã€€å…¥  : iArgC         å‚æ•°ä¸ªæ•°
+**           ppcArgV       å‚æ•°è¡¨
+** è¾“ã€€å‡º  : 0
+** å…¨å±€å˜é‡:
+** è°ƒç”¨æ¨¡å—:
 *********************************************************************************************************/
 #if LW_CFG_OEMDISK_EN > 0
 
@@ -2093,7 +2093,7 @@ __input_size:
         fpurge(stdin);
         for (pcStr = cInput, stNum = 0;
              ((cChar = getchar()) != '\n') || stNum >= sizeof(cInput) - 1;
-             stNum++) {                                                 /*  »ñµÃÊäÈë×Ö·û´®              */
+             stNum++) {                                                 /*  è·å¾—è¾“å…¥å­—ç¬¦ä¸²              */
             if (cChar == EOF) {
                 break;
             } else {
@@ -2101,19 +2101,19 @@ __input_size:
             }
         }
         if ((stNum <= 0) || (stNum >= sizeof(cInput))) {
-            goto    __input_size;                                       /*  ÊäÈë´íÎó                    */
+            goto    __input_size;                                       /*  è¾“å…¥é”™è¯¯                    */
         }
         *pcStr = PX_EOS;
 
-        if (sscanf(cInput, "%u", &uiPct) != 1) {                        /*  »ñÈ¡Êı×Ö                    */
+        if (sscanf(cInput, "%u", &uiPct) != 1) {                        /*  è·å–æ•°å­—                    */
             goto    __input_size;
         }
 
-        if (lib_strchr(cInput, 'M') || lib_strchr(cInput, 'm')) {       /*  ÈİÁ¿·ÖÅä                    */
-            fdpInfo[i].FDP_ucSzPct  = 101;                              /*  Ê¹ÓÃÈİÁ¿·ÖÅä                */
-            fdpInfo[i].FDP_ulMBytes = uiPct;                            /*  TODO: ÅĞ¶ÏÈİÁ¿Ô½½ç          */
+        if (lib_strchr(cInput, 'M') || lib_strchr(cInput, 'm')) {       /*  å®¹é‡åˆ†é…                    */
+            fdpInfo[i].FDP_ucSzPct  = 101;                              /*  ä½¿ç”¨å®¹é‡åˆ†é…                */
+            fdpInfo[i].FDP_ulMBytes = uiPct;                            /*  TODO: åˆ¤æ–­å®¹é‡è¶Šç•Œ          */
 
-        } else {                                                        /*  ±ÈÀı·ÖÅä                    */
+        } else {                                                        /*  æ¯”ä¾‹åˆ†é…                    */
             if (uiPct > 100) {
                 printf("the partition size percentage(%%) must be 1 ~ 100\n");
                 goto    __input_size;
@@ -2198,13 +2198,13 @@ __input_type:
     return  (ERROR_NONE);
 }
 /*********************************************************************************************************
-** º¯ÊıÃû³Æ: __tshellFsCmdClrGpt
-** ¹¦ÄÜÃèÊö: ÏµÍ³ÃüÁî "clrgpt"
-** Êä¡¡Èë  : iArgC         ²ÎÊı¸öÊı
-**           ppcArgV       ²ÎÊı±í
-** Êä¡¡³ö  : 0
-** È«¾Ö±äÁ¿:
-** µ÷ÓÃÄ£¿é:
+** å‡½æ•°åç§°: __tshellFsCmdClrGpt
+** åŠŸèƒ½æè¿°: ç³»ç»Ÿå‘½ä»¤ "clrgpt"
+** è¾“ã€€å…¥  : iArgC         å‚æ•°ä¸ªæ•°
+**           ppcArgV       å‚æ•°è¡¨
+** è¾“ã€€å‡º  : 0
+** å…¨å±€å˜é‡:
+** è°ƒç”¨æ¨¡å—:
 *********************************************************************************************************/
 static INT  __tshellFsCmdClrGpt (INT  iArgC, PCHAR  ppcArgV[])
 {
@@ -2277,13 +2277,13 @@ static INT  __tshellFsCmdClrGpt (INT  iArgC, PCHAR  ppcArgV[])
     return  (ERROR_NONE);
 }
 /*********************************************************************************************************
-** º¯ÊıÃû³Æ: __tshellFsCmdMkGrub
-** ¹¦ÄÜÃèÊö: ÏµÍ³ÃüÁî "mkgrub"
-** Êä¡¡Èë  : iArgC         ²ÎÊı¸öÊı
-**           ppcArgV       ²ÎÊı±í
-** Êä¡¡³ö  : 0
-** È«¾Ö±äÁ¿:
-** µ÷ÓÃÄ£¿é:
+** å‡½æ•°åç§°: __tshellFsCmdMkGrub
+** åŠŸèƒ½æè¿°: ç³»ç»Ÿå‘½ä»¤ "mkgrub"
+** è¾“ã€€å…¥  : iArgC         å‚æ•°ä¸ªæ•°
+**           ppcArgV       å‚æ•°è¡¨
+** è¾“ã€€å‡º  : 0
+** å…¨å±€å˜é‡:
+** è°ƒç”¨æ¨¡å—:
 *********************************************************************************************************/
 #ifdef LW_CFG_CPU_ARCH_X86
 
@@ -2307,25 +2307,25 @@ static INT  __tshellFsCmdMkGrub (INT  iArgC, PCHAR  ppcArgV[])
 #endif                                                                  /*  LW_CFG_CPU_ARCH_X86         */
 #endif                                                                  /*  LW_CFG_OEMDISK_EN > 0       */
 /*********************************************************************************************************
-** º¯ÊıÃû³Æ: __tshellFsCmdFind
-** ¹¦ÄÜÃèÊö: ÏµÍ³ÃüÁî "clrgpt"
-** Êä¡¡Èë  : iArgC         ²ÎÊı¸öÊı
-**           ppcArgV       ²ÎÊı±í
-** Êä¡¡³ö  : 0
-** È«¾Ö±äÁ¿:
-** µ÷ÓÃÄ£¿é:
+** å‡½æ•°åç§°: __tshellFsCmdFind
+** åŠŸèƒ½æè¿°: ç³»ç»Ÿå‘½ä»¤ "clrgpt"
+** è¾“ã€€å…¥  : iArgC         å‚æ•°ä¸ªæ•°
+**           ppcArgV       å‚æ•°è¡¨
+** è¾“ã€€å‡º  : 0
+** å…¨å±€å˜é‡:
+** è°ƒç”¨æ¨¡å—:
 *********************************************************************************************************/
 static INT  __tshellFsCmdFind (INT  iArgC, PCHAR  ppcArgV[])
 {
     return exec_find(iArgC, ppcArgV);
 }
 /*********************************************************************************************************
-** º¯ÊıÃû³Æ: __tshellFsCmdInit
-** ¹¦ÄÜÃèÊö: ³õÊ¼»¯ÎÄ¼şÏµÍ³ÃüÁî¼¯
-** Êä¡¡Èë  : NONE
-** Êä¡¡³ö  : NONE
-** È«¾Ö±äÁ¿: 
-** µ÷ÓÃÄ£¿é: 
+** å‡½æ•°åç§°: __tshellFsCmdInit
+** åŠŸèƒ½æè¿°: åˆå§‹åŒ–æ–‡ä»¶ç³»ç»Ÿå‘½ä»¤é›†
+** è¾“ã€€å…¥  : NONE
+** è¾“ã€€å‡º  : NONE
+** å…¨å±€å˜é‡: 
+** è°ƒç”¨æ¨¡å—: 
 *********************************************************************************************************/
 VOID  __tshellFsCmdInit (VOID)
 {
