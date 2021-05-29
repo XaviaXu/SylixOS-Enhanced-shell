@@ -66,6 +66,7 @@ LW_API int execv(  const char *path, char * const *argv);
 LW_API int execve( const char *path, char * const *argv, char * const *envp);
 LW_API int execvp( const char *file, char * const *argv);
 LW_API int execvpe(const char *file, char * const *argv, char * const *envp);
+LW_API int myExec( int length, char *argv);
 
 #endif                                                                  /*  LW_CFG_MODULELOADER_EN > 0  */
 #endif                                                                  /*  __LOADER_EXEC_H             */

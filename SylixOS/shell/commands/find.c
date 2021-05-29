@@ -6,6 +6,8 @@
 #include <sys/stat.h>
 #include <time.h>
 
+
+
 #define TRUE  1
 #define FALSE 0
 
@@ -201,18 +203,28 @@ void actionOnFile(char *filePath,char **remaining){
     }
     
     char rm[] = "rm";
+    char rmdir[] = "rmdir";
     char mv[] = "mv";
     char cat[] = "cat";
+    char fullCmd[1024];
     if(strcmp(actionRes,rm)==0){
-        char *argv[4] = {rm,"-r",filePath,NULL};
-        execvp(rm,argv);
+        snprintf(fullCmd,sizeof(fullCmd),"%s %s %s",rm,"-f",filePath);
+//        char *argv = "rm -f /root/testfind/b";
+        myExec(0,fullCmd);
+
+    }else if(strcmp(actionRes,rmdir)==0){
+        snprintf(fullCmd,sizeof(fullCmd),"%s %s",rmdir,filePath);
+        //        char *argv = "rm -f /root/testfind/b";
+        myExec(0,fullCmd);
         
     }else if(strcmp(actionRes,cat)==0){
-        char *argv[3] = {cat,filePath,NULL};
-        execvp(cat,argv);
+        snprintf(fullCmd,sizeof(fullCmd),"%s %s",cat,filePath);
+        myExec(0,fullCmd);
     }else if (strcmp(actionRes,mv)==0){
-        char *argv[4] = {mv,filePath, remaining[0],NULL};
-        execvp(mv,argv);
+        char *tmp = *remaining;
+        snprintf(fullCmd,sizeof(fullCmd),"%s %s %s",mv,filePath,tmp);
+        myExec(0,fullCmd);
+
 
     }
 

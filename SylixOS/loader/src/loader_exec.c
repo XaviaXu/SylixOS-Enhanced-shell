@@ -44,6 +44,8 @@
 #include "../include/loader_exec.h"
 #include "process.h"
 #include "sys/wait.h"
+
+#include "../../shell/ttinyShell/ttinyShell.h"
 /*********************************************************************************************************
   函数声明
 *********************************************************************************************************/
@@ -1201,6 +1203,12 @@ int execvpe (const char *file, char * const *argv, char * const *envp)
     return  (spawnvpe(P_OVERLAY, file, argv, envp));                    /*  替换当前环境运行进程        */
 }
 
+
+LW_API int myExec( int length, char * argv){
+
+    return API_TShellExec(argv);
+
+}
 #endif                                                                  /*  LW_CFG_MODULELOADER_EN > 0  */
 /*********************************************************************************************************
   END
