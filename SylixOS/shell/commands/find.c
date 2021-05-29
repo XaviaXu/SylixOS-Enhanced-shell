@@ -172,7 +172,8 @@ int checkTime(time_t fileTime, char *deltaTime){
 }
 
 int checkStandard(char *filePath,char *fileName,char fileType){
-    int flag = TRUE;
+    int flag;
+    flag = TRUE;
     struct stat fileStat;
     stat(filePath,&fileStat);
 
@@ -271,10 +272,25 @@ void find(char* path,int depth,char **argv){
     }
 }
 
+void init(){
+    nameRes = NULL;
+    nameFlag = FALSE;
+    inumRes = -1;
+    rootDir = NULL;
+    typeRes = NULL;
+    maxDepth = -1;
+    sizeRes = -1;
+    sizeFlag = 0;
+    aTimeRes = NULL;
+    mTimeRes = NULL;
+    actionRes = NULL;
+}
+
 int exec_find (int argc, char ** argv){
     
     char c;
     int valid = 1; 
+    init();
 
     if(argc > 1 && argv[1][0] !='-'){
         //dir given

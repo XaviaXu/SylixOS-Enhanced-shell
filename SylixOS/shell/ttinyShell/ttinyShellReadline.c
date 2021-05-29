@@ -785,20 +785,25 @@ static VOID  __tshellKeywordMatch (INT  iFd, PCHAR  pcKey,
     __PTSHELL_KEYWORD   keywordList[__KEYWORD_BUFF_SIZE];
     CHAR                cPrint[MAX_FILENAME_LENGTH];
 
-    ulGetNum = __tshellKeywordList(pskwNodeStart, keywordList, __KEYWORD_BUFF_SIZE);
+    ulGetNum = __tshellKeywordList(pskwNodeStart,
+            keywordList,
+            __KEYWORD_BUFF_SIZE);
 
     stKwLen = lib_strlen(pcKey);
     stMinSimilar = 0;
     fst = -1;
 
     for (i = 0; i < ulGetNum; i++) {
-        if (lib_strncmp(pcKey, keywordList[i]->SK_pcKeyword, stKwLen) == 0) {
+        if (lib_strncmp(pcKey,
+                keywordList[i]->SK_pcKeyword,
+                stKwLen) == 0) {
             ++kwMatch;
             if(fst == -1){
                 fst = i;
                 stMinSimilar = lib_strlen(keywordList[fst]->SK_pcKeyword);
             }else{
-                stSimilar = __similarLen(keywordList[fst]->SK_pcKeyword, keywordList[i]->SK_pcKeyword);
+                stSimilar = __similarLen(keywordList[fst]->SK_pcKeyword,
+                        keywordList[i]->SK_pcKeyword);
                 if(stSimilar < stMinSimilar) {
                     stMinSimilar = stSimilar;
                 }
@@ -807,9 +812,15 @@ static VOID  __tshellKeywordMatch (INT  iFd, PCHAR  pcKey,
     }
 
     if(fst == -1) {
-        snprintf(cPrint, MAX_FILENAME_LENGTH, "%s", pcKey);
+        snprintf(cPrint,
+                MAX_FILENAME_LENGTH,
+                "%s",
+                pcKey);
     } else {
-        snprintf(cPrint, MAX_FILENAME_LENGTH, "%s", keywordList[fst]->SK_pcKeyword);
+        snprintf(cPrint,
+                MAX_FILENAME_LENGTH,
+                "%s",
+                keywordList[fst]->SK_pcKeyword);
     }
 
     if(kwMatch == 1) { /* 补全这一关键字 */
@@ -819,7 +830,9 @@ static VOID  __tshellKeywordMatch (INT  iFd, PCHAR  pcKey,
             return;
         write(iFd, &cPrint[stKwLen], stCatLen);
 
-        lib_strlcat(CTX_BUFFER, &cPrint[stKwLen], LW_CFG_SHELL_MAX_COMMANDLEN);
+        lib_strlcat(CTX_BUFFER,
+                &cPrint[stKwLen],
+                LW_CFG_SHELL_MAX_COMMANDLEN);
         CTX_TOTAL  += (UINT)stCatLen;
         CTX_CURSOR  = CTX_TOTAL;
 
@@ -829,9 +842,12 @@ static VOID  __tshellKeywordMatch (INT  iFd, PCHAR  pcKey,
         tshellColorStart2(LW_TSHELL_COLOR_LIGHT_GREEN, iFd);
 
         for (i = 0; i < ulGetNum; i++) {
-            stSimilar = __similarLen(keywordList[fst]->SK_pcKeyword, keywordList[i]->SK_pcKeyword);
+            stSimilar = __similarLen(keywordList[fst]->SK_pcKeyword,
+                    keywordList[i]->SK_pcKeyword);
             if(stSimilar >= stMinSimilar) {
-                fdprintf(iFd, "%s  ", keywordList[i]->SK_pcKeyword);
+                fdprintf(iFd,
+                        "%s  ",
+                        keywordList[i]->SK_pcKeyword);
             }
         }
 
@@ -848,7 +864,9 @@ static VOID  __tshellKeywordMatch (INT  iFd, PCHAR  pcKey,
             CTX_TOTAL  = lib_strlen(CTX_BUFFER);
             CTX_CURSOR = CTX_TOTAL;
         }
-        write(iFd, CTX_BUFFER, CTX_TOTAL);
+        write(iFd,
+                CTX_BUFFER,
+                CTX_TOTAL);
     }
 
 }
