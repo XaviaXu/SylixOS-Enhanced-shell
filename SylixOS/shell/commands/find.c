@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <dirent.h>
 #include <sys/stat.h>
+#include <time.h>
 
 #define TRUE  1
 #define FALSE 0
@@ -22,6 +23,7 @@ long sizeRes = -1;
 int sizeFlag = 0;
 char *aTimeRes = NULL;
 char *mTimeRes = NULL;
+char *actionRes = NULL;
 
 
 char currDir[] = ".";
@@ -37,6 +39,7 @@ static struct option options[] = {
     {"size",required_argument,NULL,'s'},
     {"amin",required_argument,NULL,'a'},
     {"mmin",required_argument,NULL,'m'},
+    {"exec",required_argument,NULL,'e'},
     {NULL,0,NULL,0}
 };
 
@@ -191,7 +194,31 @@ int checkStandard(char *filePath,char *fileName,char fileType){
 
 }
 
-void find(char* path,int depth){
+void actionOnFile(char *filePath,char **remaining){
+    if(actionRes==NULL){
+        printf("%s\n",filePath);
+        return;
+    }
+    
+    char rm[] = "rm";
+    char mv[] = "mv";
+    char cat[] = "cat";
+    if(strcmp(actionRes,rm)==0){
+        char *argv[4] = {rm,"-r",filePath,NULL};
+        execvp(rm,argv);
+        
+    }else if(strcmp(actionRes,cat)==0){
+        char *argv[3] = {cat,filePath,NULL};
+        execvp(cat,argv);
+    }else if (strcmp(actionRes,mv)==0){
+        char *argv[4] = {mv,filePath, remaining[0],NULL};
+        execvp(mv,argv);
+
+    }
+
+}
+
+void find(char* path,int depth,char **argv){
     DIR *dir;
     struct dirent *file;
     char *fileName;
@@ -208,20 +235,23 @@ void find(char* path,int depth){
             }else{
                 snprintf(fullPath,sizeof(fullPath),"%s/%s",path,fileName);
             }
-                        
+            
+            
 
             if(!(strcmp(currDir,fileName)==0||strcmp(preDir,fileName)==0)){
                 //selection
                 if(checkStandard(fullPath,fileName,fileType)){
-                    printf("%s\n",fullPath);
+                    // printf("%s\n",fullPath);
+                    actionOnFile(fullPath,argv);
                 }
 
                 if(fileType == DT_DIR&&(maxDepth==-1||depth>0)){
-                    find(fullPath,depth-1);
+                    find(fullPath,depth-1,argv);
                 }
             }
         }
         closedir(dir);
+
     }else{
         printf("Could not open directory %s\n", rootDir);
     }
@@ -241,7 +271,7 @@ int exec_find (int argc, char ** argv){
         rootDir = ".";
     }
 
-    while ((c = getopt_long_only(argc, argv, "n:N:p:d:t:s:a:m:", options, NULL)) != -1) {
+    while ((c = getopt_long_only(argc, argv, "n:N:p:d:t:s:a:m:e:", options, NULL)) != -1) {
 
         /* code */
         switch (c)
@@ -271,7 +301,9 @@ int exec_find (int argc, char ** argv){
         case 'm':
             mTimeRes = optarg;
             break;
-
+        case 'e':
+            actionRes = optarg;
+            break;
         default:
             valid = 0;
             break;
@@ -288,8 +320,7 @@ int exec_find (int argc, char ** argv){
     }
     //find
     if(valid){
-        find(rootDir,maxDepth);
+        find(rootDir,maxDepth,argv);
     }
-    return 0;
 
 }
